@@ -1,0 +1,7 @@
+garmin.config.json
+oauth_tokens
+*.fit
+*.zip
+node_modules
+dist
+device.json

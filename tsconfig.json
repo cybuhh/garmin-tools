@@ -1,0 +1,17 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "files": ["types/garmin__fitsdk.d.ts"],
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2017",
+    "strict": true,
+    "sourceMap": true,
+    "declaration": true,
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "typeRoots": ["./node_modules/@types", "./types"]
+  },
+  "include": ["src"]
+}

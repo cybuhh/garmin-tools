@@ -1,0 +1,27 @@
+{
+  "name": "garmin-tools",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx ts-node src/index.ts",
+    "watch": "nodemon src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@garmin/fitsdk": "^21.161.0",
+    "form-data": "^4.0.1",
+    "garmin-connect": "^1.6.2",
+    "unzipper": "^0.12.3"
+  },
+  "devDependencies": {
+    "@types/unzipper": "^0.10.10",
+    "esrun": "^3.2.26",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.4.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
