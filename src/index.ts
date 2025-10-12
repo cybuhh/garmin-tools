@@ -2,15 +2,15 @@ import { GarminConnect } from 'garmin-connect';
 import { ExportFileType, UploadFileType } from 'garmin-connect/dist/garmin/types';
 import { Decoder, Stream } from '@garmin/fitsdk';
 import { readFile, unlink, writeFile } from 'fs/promises';
-import getPatchedActivity from './getNewActivityData';
-import changeDevice from './changeDevice';
-import extractActivityFile from './extractActivityFile';
+import getPatchedActivity from './garmin/getNewActivityData';
+import changeDevice from './garmin/changeDevice';
+import extractActivityFile from './garmin/extractActivityFile';
 import { join } from 'path';
-import { loginWithToken, loginWithCredentials, exportTokenToFile } from './login';
-import getLatestCyclingActivity from './getLatestCyclingActivity';
-import updateLatestActivityName from './updateLatestActivityName';
-import getUploadedActivityIdFromStatus from './getUploadedActivityIdFromStatus';
-import uploadActivity from './uploadActivity';
+import getLatestCyclingActivity from './garmin/getLatestCyclingActivity';
+import updateLatestActivityName from './garmin/updateLatestActivityName';
+import getUploadedActivityIdFromStatus from './garmin/getUploadedActivityIdFromStatus';
+import uploadActivity from './garmin/uploadActivity';
+import { getClient } from './garmin/getClient';
 
 const CWD = process.cwd();
 const device = require(join(CWD, 'etc/device.json'));
@@ -26,18 +26,7 @@ async function downloadLatestCycling(client: GarminConnect, activityId: number, 
 }
 
 (async function main() {
-  const GCClient = new GarminConnect({ username: '', password: '' });
-
-  try {
-    if (!(await loginWithToken(GCClient))) {
-      await loginWithCredentials(GCClient);
-      exportTokenToFile(GCClient);
-      process.exit(0);
-    }
-  } catch (error) {
-    console.error("Can't login to garmin connect", error);
-    process.exit(1);
-  }
+  const GCClient = await getClient();
 
   const { activityId, activityName } = await getLatestCyclingActivity(GCClient);
 
