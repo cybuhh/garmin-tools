@@ -11,13 +11,13 @@ function isFormatSupported(detectedFormat: UploadFileType) {
   return !supportedFormats.includes(detectedFormat);
 }
 
-export default async function uploadActivity(httpClient: HttpClient, filePath: string, format: UploadFileTypeTypeValue = 'fit'): Promise<string> {
+export default async function uploadActivity(httpClient: HttpClient, filePath: string, format: UploadFileTypeTypeValue = UploadFileType.fit): Promise<string> {
   const detectedFormat = (format || path.extname(filePath))?.toLowerCase() as UploadFileType;
   if (isFormatSupported(detectedFormat)) {
     throw new Error('uploadActivity - Invalid format: ' + format);
   }
 
-  const fileBuffer = await readFile(filePath);
+  const fileBuffer = (await readFile(filePath)) as unknown as BlobPart;
   const blob = new Blob([fileBuffer]);
 
   const form = new FormData();
