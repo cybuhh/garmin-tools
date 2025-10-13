@@ -1,4 +1,5 @@
 import * as fs from 'fs/promises';
+import * as path from 'path';
 import * as strava from 'strava-v3';
 
 // https://www.strava.com/oauth/authorize?client_id=...&response_type=code&redirect_uri=http://localhost/exchange_token&approval_prompt=force&scope=activity:read
@@ -6,7 +7,8 @@ import * as strava from 'strava-v3';
 // https://developers.strava.com/docs/reference/#api-Routes-getRouteAsGPX
 // https://www.strava.com/activities/.../export_original
 
-const CONFIG_FILE = 'strava_config.json';
+const CWD = process.cwd();
+const CONFIG_FILE = path.join(CWD, 'etc/strava_config.json');
 
 interface StravaConfig {
   client_id: string;
@@ -17,18 +19,14 @@ interface StravaConfig {
 }
 
 class StatusCodeError extends Error {
+  name: string;
   statusCode: number;
-  data: unknown;
-  options: unknown;
-  response: unknown;
 
-  constructor(statusCode: number, statusText: string, data: unknown, options: unknown, response: unknown) {
-    super(`Request failed with status ${statusCode}: ${statusText}`);
+  constructor(statusCode: number) {
+    super();
     this.name = 'StatusCodeError';
     this.statusCode = statusCode;
-    this.data = data;
-    this.options = options;
-    this.response = response;
+    Object.setPrototypeOf(this, StatusCodeError.prototype);
   }
 }
 
@@ -60,7 +58,7 @@ export async function getLatestStravaActivity() {
     const [activity] = await stravaClient.athlete.listActivities({ page: 1, per_page: 1 });
     return activity;
   } catch (e) {
-    if (e instanceof StatusCodeError && e.statusCode === 401) {
+    if (e instanceof Error && 'statusCode' in e && e.statusCode === 401) {
       console.info('refreshing token');
       await refreshToken(config);
       return;
