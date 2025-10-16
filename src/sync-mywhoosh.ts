@@ -10,8 +10,12 @@ import updateLatestActivityName from './garmin/updateLatestActivityName';
   const myWhooshDataPath = getDataPath();
   const latestActivityFile = await getLastestActivityFile(myWhooshDataPath);
   const latestStravaActivity = await getLatestStravaActivity();
-  const gcClient = await getClient();
+  if (!latestStravaActivity) {
+    console.error('Latest strava activity is missing');
+    process.exit(1);
+  }
 
+  const gcClient = await getClient();
   const uploadedFileStatusLocation = await uploadActivity(gcClient.client, latestActivityFile);
   const uploadedActivityId = await getUploadedActivityIdFromStatus(gcClient.client, uploadedFileStatusLocation);
   await updateLatestActivityName(gcClient, uploadedActivityId, latestStravaActivity.name);
