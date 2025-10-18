@@ -3,7 +3,7 @@ import { readFile, unlink, writeFile } from 'fs/promises';
 import { GarminConnectClient } from 'garmin/client';
 import { Decoder, Stream } from '@garmin/fitsdk';
 import { ExportFileType, UploadFileType } from 'garmin-connect/dist/garmin/types';
-import { ActivitySubType, ActivityType } from 'garmin-connect/dist/garmin/types/activity';
+import { ActivityType, ActivitySubType } from 'garmin-connect/dist/garmin/types/activity';
 import getPatchedActivity from 'fit/getNewActivityData';
 import changeDevice from 'fit/changeDevice';
 import extractActivityFile from 'fit/extractActivityFile';

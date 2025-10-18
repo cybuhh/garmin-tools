@@ -2,7 +2,7 @@
   "ts-node": {
     "files": true
   },
-  "files": ["types/garmin__fitsdk.d.ts", "types/strava.d.ts"],
+  "files": ["types/garminFitSDK.d.ts", "types/strava.d.ts"],
   "compilerOptions": {
     "module": "commonjs",
     "target": "es2017",
