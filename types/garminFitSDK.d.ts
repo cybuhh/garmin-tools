@@ -19,26 +19,24 @@ declare module '@garmin/fitsdk' {
   }
 
   export interface DecodedMessages {
-    fileIdMesgs: ReadonlyArray<Message>;
-    deviceInfoMesgs: ReadonlyArray<any>;
-    eventMesgs: ReadonlyArray<any>;
-    recordMesgs: ReadonlyArray<any>;
-    lapMesgs: ReadonlyArray<any>;
-    sessionMesgs: ReadonlyArray<any>;
-    activityMesgs: ReadonlyArray<any>;
+    fileIdMesgs: ReadonlyArray<unknown>;
+    deviceInfoMesgs: ReadonlyArray<unknown>;
+    eventMesgs: ReadonlyArray<unknown>;
+    recordMesgs: ReadonlyArray<unknown>;
+    lapMesgs: ReadonlyArray<unknown>;
+    sessionMesgs: ReadonlyArray<unknown>;
+    activityMesgs: ReadonlyArray<unknown>;
   }
 
   export class Decoder {
     constructor(stream: Stream);
     public static isFIT(stream: Stream): boolean;
-    public read(): {
-      messages: DecodedMessages;
-    };
+    public read(): { messages: DecodedMessages };
   }
 
   export class Encoder {
     constructor();
-    public writeMesg(msg: any): void;
+    public writeMesg(msg: Message): void;
     public close(): Buffer<ArrayBufferLike>;
   }
 
