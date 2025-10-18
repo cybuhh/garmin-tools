@@ -11,6 +11,6 @@ export default async function extractActivityFile(activityId: number, directory:
 
     return dstFilename;
   } catch (err) {
-    console.error(err);
+    process.stdout.write(JSON.stringify(err));
   }
 }

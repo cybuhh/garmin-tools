@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx ts-node src/index.ts",
-    "sync": "nodemon --config sync.json",
-    "watch": "nodemon src/index.ts",
+    "garmin-change-device": "ts-node -r tsconfig-paths/register src/ts-node -r tsconfig-paths/register src/",
+    "mywhoosh2garmin-sync": "ts-node -r tsconfig-paths/register src/mywhoosh2garmin-sync",
+    "mywhoosh2garmin-upload": "ts-node -r tsconfig-paths/register src/mywhoosh2garmin-upload",
+    "strava-last-activity": "nodemon --config strava-last-activity.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -17,13 +18,13 @@
     "form-data": "^4.0.1",
     "garmin-connect": "^1.6.2",
     "strava-v3": "^2.2.1",
+    "tsconfig-paths": "^4.2.0",
     "unzipper": "^0.12.3"
   },
   "devDependencies": {
     "@types/unzipper": "^0.10.10",
-    "esrun": "^3.2.26",
     "nodemon": "^3.1.10",
-    "prettier": "^3.4.2",
+    "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   }

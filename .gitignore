@@ -1,5 +1,6 @@
 strava_config.json
 garmin.config.json
+garmin_presets.json
 oauth_tokens
 *.fit
 *.zip
