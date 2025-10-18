@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "mywhoosh2garmin-sync": "ts-node -r tsconfig-paths/register src/mywhoosh2garmin-sync",
+    "mywhoosh2garmin-upload": "ts-node -r tsconfig-paths/register src/mywhoosh2garmin-upload",
     "start": "npx ts-node src/index.ts",
     "sync": "nodemon --config sync.json",
     "watch": "nodemon src/index.ts",
@@ -17,6 +19,7 @@
     "form-data": "^4.0.1",
     "garmin-connect": "^1.6.2",
     "strava-v3": "^2.2.1",
+    "tsconfig-paths": "^4.2.0",
     "unzipper": "^0.12.3"
   },
   "devDependencies": {

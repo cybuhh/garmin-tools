@@ -1,36 +1,30 @@
-import { GarminConnect } from 'garmin-connect';
-import { ExportFileType, UploadFileType } from 'garmin-connect/dist/garmin/types';
-import { Decoder, Stream } from '@garmin/fitsdk';
-import { readFile, unlink, writeFile } from 'fs/promises';
-import getPatchedActivity from './garmin/getNewActivityData';
-import changeDevice from './garmin/changeDevice';
-import extractActivityFile from './garmin/extractActivityFile';
 import { join } from 'path';
-import getLatestCyclingActivity from './garmin/getLatestCyclingActivity';
-import updateLatestActivityName from './garmin/updateLatestActivityName';
-import getUploadedActivityIdFromStatus from './garmin/getUploadedActivityIdFromStatus';
-import uploadActivity from './garmin/uploadActivity';
-import { getClient } from './garmin/getClient';
+import { readFile, unlink, writeFile } from 'fs/promises';
+import { GarminConnectClient } from 'garmin/client';
+import { Decoder, Stream } from '@garmin/fitsdk';
+import { ExportFileType, UploadFileType } from 'garmin-connect/dist/garmin/types';
+import { ActivitySubType, ActivityType } from 'garmin-connect/dist/garmin/types/activity';
+import getPatchedActivity from 'fit/getNewActivityData';
+import changeDevice from 'fit/changeDevice';
+import extractActivityFile from 'fit/extractActivityFile';
+import * as device from '../etc/device.json';
 
 const CWD = process.cwd();
-const device = require(join(CWD, 'etc/device.json'));
 
-async function downloadLatestCycling(client: GarminConnect, activityId: number, directory: string) {
+(async function main() {
+  const client = new GarminConnectClient();
+  await client.initialize();
+
+  const [activity] = await client.getActivities(0, 1, ActivityType.Cycling, 'virtual_ride' as unknown as ActivitySubType);
+  const { activityId, activityName } = activity;
+
   await client.downloadOriginalActivityData(
     {
       activityId,
     },
-    directory,
+    CWD,
     ExportFileType.zip
   );
-}
-
-(async function main() {
-  const GCClient = await getClient();
-
-  const { activityId, activityName } = await getLatestCyclingActivity(GCClient);
-
-  await downloadLatestCycling(GCClient, activityId, CWD);
 
   const srcFilename = await extractActivityFile(activityId, CWD);
 
@@ -51,9 +45,9 @@ async function downloadLatestCycling(client: GarminConnect, activityId: number, 
 
   await unlink(srcFilename);
 
-  const uploadedFileStatusLocation = await uploadActivity(GCClient.client, dstFilename, UploadFileType.fit);
-  const uploadedActivityId = await getUploadedActivityIdFromStatus(GCClient.client, uploadedFileStatusLocation);
+  const uploadedFileStatusLocation = await client.uploadActivity(dstFilename, UploadFileType.fit);
+  const uploadedActivityId = await client.getUploadedActivityIdFromStatus(uploadedFileStatusLocation);
 
-  await updateLatestActivityName(GCClient, uploadedActivityId, activityName);
-  await GCClient.deleteActivity({ activityId });
+  await client.updateLatestActivityName(uploadedActivityId, activityName);
+  await client.deleteActivity({ activityId });
 })();

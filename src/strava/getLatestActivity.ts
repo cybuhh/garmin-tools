@@ -41,9 +41,9 @@ async function refreshToken(config: StravaConfig) {
         refresh_token,
       })
     );
-    console.info('New token stored');
+    process.stdout.write('New token stored');
   } catch (e) {
-    console.error('Token refresh error');
+    process.stdout.write('Token refresh error');
   }
 }
 
@@ -59,7 +59,7 @@ export async function getLatestStravaActivity() {
     return activity;
   } catch (e) {
     if (e instanceof Error && 'statusCode' in e && e.statusCode === 401) {
-      console.info('refreshing token');
+      process.stdout.write('Refreshing token');
       await refreshToken(config);
       return;
     }
