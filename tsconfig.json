@@ -1,20 +1,24 @@
 {
   "ts-node": {
-    "files": true
+    "files": true,
+    "require": ["tsconfig-paths/register"]
   },
   "files": ["types/garminFitSDK.d.ts", "types/strava.d.ts"],
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2017",
+    "module": "nodenext",
+    "target": "ES2020",
     "strict": true,
     "sourceMap": true,
+    "esModuleInterop": true,
     "declaration": true,
-    "resolveJsonModule": true,
     "outDir": "./dist",
+    "moduleResolution": "nodenext",
+    "resolveJsonModule": true,
     "paths": {
       "*": ["./src/*"]
     },
     "typeRoots": ["./node_modules/@types", "./types"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

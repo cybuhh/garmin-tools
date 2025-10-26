@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "garmin-change-device": "ts-node -r tsconfig-paths/register src/ts-node -r tsconfig-paths/register src/",
     "mywhoosh2garmin-sync": "ts-node -r tsconfig-paths/register src/mywhoosh2garmin-sync",
@@ -14,12 +15,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@garmin/fitsdk": "^21.161.0",
+    "@garmin/fitsdk": "^21.178.0",
+    "@intervals-icu/js-data-model": "^1.1.0",
     "@types/node": "^24.7.2",
+    "chalk": "^5.6.2",
     "form-data": "^4.0.1",
     "garmin-connect": "^1.6.2",
     "strava-v3": "^2.2.1",
-    "tsconfig-paths": "^4.2.0",
     "unzipper": "^0.12.3"
   },
   "devDependencies": {
@@ -29,6 +31,7 @@
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.1"
   }
