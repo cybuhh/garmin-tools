@@ -5,7 +5,7 @@ import * as path from 'path';
 import { readFile } from 'fs/promises';
 import { stdin as input, stdout as output } from 'process';
 import { UrlClass } from 'garmin-connect/dist/garmin/UrlClass';
-import { UploadFileTypeTypeValue, UploadFileType } from 'garmin-connect/dist/garmin/types';
+import { UploadFileTypeTypeValue, UploadFileType, IActivity, IUserInfo, ISocialProfile } from 'garmin-connect/dist/garmin/types';
 import delay from '../common/delay';
 
 const TOKENS_PATH = 'oauth_tokens';
@@ -132,4 +132,42 @@ export class GarminConnectClient extends GarminConnect {
     const payload = { activityId, activityName };
     return this.client.put(`${urlClass.ACTIVITY}${activityId}`, payload);
   }
+
+  async getSocialProfile(userId: number) {
+    const qs = new URLSearchParams();
+    qs.append('userId', String(userId));
+    const query = qs.toString();
+
+    const socialProfile = await this.client.get<{ [userId]: ISocialProfile }>(`${urlClass.GC_API}/userprofile-service/socialProfile/v2/public/multiple/id?${query}`);
+    return socialProfile[userId] as ISocialProfile;
+  }
+
+  async getActivitiesFromNewsfeed(ownerId: number) {
+    const qs = new URLSearchParams();
+    qs.append('start', String(1));
+    qs.append('limit', String(999));
+    const query = qs.toString();
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+
+    const currentMonthDate = `${year}-${month}-`;
+
+    const { activityList } = await this.client.get<NewsfeedItem>(`${urlClass.GC_API}/web-gateway/newsfeed/v2?${query}`);
+    return activityList
+      .filter((activity) => activity.ownerId === ownerId && activity.startTimeLocal.startsWith(currentMonthDate))
+      .map((activity) => ({
+        activityId: activity.activityId,
+        activityName: activity.activityName,
+        startTimeLocal: activity.startTimeLocal,
+      }));
+  }
+
+  async likeActivity(activityId: number) {
+    return this.client.post<{}>(`${urlClass.GC_API}/conversation-service/conversation/like/ACTIVITY/${activityId}`, {});
+  }
+}
+interface NewsfeedItem {
+  activityList: ReadonlyArray<IActivity>;
 }
