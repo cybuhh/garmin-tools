@@ -6,7 +6,7 @@ import { readFile } from 'fs/promises';
 import { stdin as input, stdout as output } from 'process';
 import { UrlClass } from 'garmin-connect/dist/garmin/UrlClass';
 import { UploadFileTypeTypeValue, UploadFileType } from 'garmin-connect/dist/garmin/types';
-import delay from 'common/delay';
+import delay from '../common/delay';
 
 const TOKENS_PATH = 'oauth_tokens';
 
@@ -44,26 +44,25 @@ export class GarminConnectClient extends GarminConnect {
   }
 
   async initialize() {
-    const loginResult = await this.loginWithToken();
-    if (loginResult) {
-      return;
+    try {
+      this.loadTokenByFile(TOKENS_PATH);
+    } catch {
+      this.regenerateToken();
     }
+  }
 
+  async regenerateToken() {
     try {
       await this.loginWithCredentials();
     } catch (error) {
-      throw Error("Can't login to garmin connect");
+      throw Error("Can't login to garmin connect. Invalid credentials");
     }
     this.exportTokenToFile(TOKENS_PATH);
-    throw Error('New login details stored please rerun app');
-  }
 
-  async loginWithToken() {
     try {
       this.loadTokenByFile(TOKENS_PATH);
-      return true;
-    } catch {
-      return false;
+    } catch (e) {
+      throw Error("Can't login to garmin connect. Failed to load token");
     }
   }
 
@@ -109,7 +108,7 @@ export class GarminConnectClient extends GarminConnect {
   async uploadActivity(filePath: string, format: UploadFileTypeTypeValue = UploadFileType.fit): Promise<string> {
     const detectedFormat = (format || path.extname(filePath))?.toLowerCase() as UploadFileType;
     if (isFormatSupported(detectedFormat)) {
-      throw new Error('uploadActivity - Invalid format: ' + format);
+      throw new Error('Upload activity - Invalid format: ' + format);
     }
 
     const fileBuffer = (await readFile(filePath)) as unknown as BlobPart;
@@ -123,11 +122,13 @@ export class GarminConnectClient extends GarminConnect {
         'Content-Type': 'multipart/form-data;',
       },
     });
-
+    if (!headers.location) {
+      throw new Error(`Upload activty - ${headers['upload-message-content']}`);
+    }
     return this.getUploadedActivityIdFromStatus(headers.location);
   }
 
-  updateLatestActivityName(activityId: string, activityName: string) {
+  async updateLatestActivityName(activityId: string, activityName: string) {
     const payload = { activityId, activityName };
     return this.client.put(`${urlClass.ACTIVITY}${activityId}`, payload);
   }

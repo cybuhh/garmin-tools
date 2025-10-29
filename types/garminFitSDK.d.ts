@@ -1,5 +1,6 @@
 declare module '@garmin/fitsdk' {
   export interface Message {
+    mesgNum: number;
     timestamp: Date;
     serialNumber?: number;
     manufacturer: string;
@@ -28,10 +29,12 @@ declare module '@garmin/fitsdk' {
     activityMesgs: ReadonlyArray<unknown>;
   }
 
+  type onReadMsgHandler = () => void;
+
   export class Decoder {
     constructor(stream: Stream);
     public static isFIT(stream: Stream): boolean;
-    public read(): { messages: DecodedMessages };
+    public read({ mesgListener: onReadMsgHandler }): { messages: DecodedMessages; errors: ReadonlyArray<Error> };
   }
 
   export class Encoder {
@@ -46,8 +49,18 @@ declare module '@garmin/fitsdk' {
   }
 
   export class Profile {
-    constructor();
-    public static MesgNum: { [key: string]: string };
+    public static types: {
+      [key: string]: string;
+    };
+    public static messages: {
+      [key: string]: {
+        num: number;
+        messagesKey: string;
+      };
+    };
+    public static MesgNum: {
+      [key: string]: string;
+    };
   }
 
   export class Utils {
