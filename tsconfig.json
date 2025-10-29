@@ -5,20 +5,17 @@
   },
   "files": ["types/garminFitSDK.d.ts", "types/strava.d.ts"],
   "compilerOptions": {
-    "module": "nodenext",
+    "module": "commonjs",
     "target": "ES2020",
     "strict": true,
     "sourceMap": true,
-    "esModuleInterop": true,
     "declaration": true,
-    "outDir": "./dist",
-    "moduleResolution": "nodenext",
     "resolveJsonModule": true,
+    "outDir": "./dist",
     "paths": {
       "*": ["./src/*"]
     },
     "typeRoots": ["./node_modules/@types", "./types"]
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "include": ["./src"]
 }

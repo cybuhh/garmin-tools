@@ -1,11 +1,11 @@
 import { EOL } from 'os';
 import chalk from 'chalk';
-import { GarminConnectClient, GearItem } from './garmin/client';
-import { intervalsIcu } from './intervalsIcu/intervalsIcu';
-import { createChangedActivity } from './fit/createChangedActivity';
+import { unlink, rename } from 'fs/promises';
+import { GarminConnectClient, GearItem } from 'garmin/client';
+import { intervalsIcu } from 'intervalsIcu/intervalsIcu';
+import { createChangedActivity } from 'fit/createChangedActivity';
 import * as intervalsIcuConfig from '../etc/intervals_icu_config.json';
 import * as presets from '../etc/garmin_presets.json';
-import { unlink, rename } from 'fs/promises';
 import * as device from '../etc/device.json';
 
 (async function main() {
@@ -35,6 +35,7 @@ import * as device from '../etc/device.json';
       throw new Error(`Error uploading activity from file ${filename}`);
     }
     await unlink(filename);
+    await unlink(backupFilename);
     process.stdout.write(`✅ Activity uploaded with id ${uploadedActivityId}` + EOL);
 
     await gcClient.updateLatestActivityName(uploadedActivityId, name);

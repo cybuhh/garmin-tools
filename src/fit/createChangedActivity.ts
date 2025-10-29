@@ -16,20 +16,22 @@ export async function createChangedActivity(srcFilename: string, dstFilename: st
   const encoder = new Encoder();
 
   const changeDevice = (message: Message) =>
-    Object.entries(message).reduce((acc, [k, v]) => ({
-      ...(acc || {}),
-      [k]: k in device ? (device as any)[k] : v,
-    }));
+    Object.entries(message).reduce(
+      (acc, [k, v]) => ({
+        ...acc,
+        [k]: k in device ? (device as any)[k] : v,
+      }),
+      {} as Message
+    );
 
   const onMesg = (messageNumber: number, message: Message) => {
     const newMessage = {
-      mesgNum: messageNumber,
       ...changeDevice(message),
-    } as unknown as Message;
-
-    /** fix invlaid fields */
+      mesgNum: messageNumber,
+    };
+    /** fix invlid fields */
     if ('developerFields' in newMessage) {
-      newMessage.developerFields = null;
+      delete newMessage.developerFields;
     }
 
     try {

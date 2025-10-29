@@ -1,5 +1,6 @@
 declare module '@garmin/fitsdk' {
   export interface Message {
+    mesgNum: number;
     timestamp: Date;
     serialNumber?: number;
     manufacturer: string;
@@ -49,8 +50,12 @@ declare module '@garmin/fitsdk' {
 
   export class Profile {
     public static types: {
-      mesgNum: {
-        [key: string]: string;
+      [key: string]: string;
+    };
+    public static messages: {
+      [key: string]: {
+        num: number;
+        messagesKey: string;
       };
     };
     public static MesgNum: {
