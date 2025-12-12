@@ -1,5 +1,8 @@
+import delay from 'common/delay';
 import { GarminConnectClient } from 'garmin/client';
 import { EOL } from 'os';
+
+const REQUEST_DELAY = 5000;
 
 (async function main() {
   const userId = Number(process.argv[2]);
@@ -21,6 +24,7 @@ import { EOL } from 'os';
     await newsFeed.reduce(
       async (acc, activity) => {
         await acc;
+        await delay(REQUEST_DELAY);
         process.stdout.write(`👍 like on ${activity.startTimeLocal} ${activity.activityId} - ${activity.activityName}` + EOL);
         return gcClient.likeActivity(activity.activityId);
       },

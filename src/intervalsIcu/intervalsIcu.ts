@@ -22,8 +22,14 @@ export function intervalsIcu({ apiKey, athleteId = '0' }: { apiKey: string; athl
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const detail = await response.json();
-    console.log(detail);
+    const activity = (await response.json()) as Activity;
+
+    return {
+      id: activity.id,
+      name: activity.name,
+      filename: activity.external_id,
+      date: activity.start_date,
+    };
   }
 
   /**
