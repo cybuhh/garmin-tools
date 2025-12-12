@@ -5,9 +5,10 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "garmin-change-device": "ts-node -r tsconfig-paths/register src/ts-node -r tsconfig-paths/register src/",
-    "mywhoosh2garmin-sync": "ts-node -r tsconfig-paths/register src/mywhoosh2garmin-sync",
+    "garmin-likes": "ts-node -r tsconfig-paths/register src/garmin-likes",
+    "strava2garmin-sync": "ts-node -r tsconfig-paths/register src/strava2garmin-sync",
     "mywhoosh2garmin-upload": "ts-node -r tsconfig-paths/register src/mywhoosh2garmin-upload",
+    "intervals2garmin-sync": "ts-node -r tsconfig-paths/register src/intervals2garmin-sync",
     "strava-last-activity": "nodemon --config strava-last-activity.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint"

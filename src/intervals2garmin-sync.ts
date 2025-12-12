@@ -12,8 +12,14 @@ import * as device from '../etc/device.json';
   const intervalsClient = intervalsIcu(intervalsIcuConfig);
   const gcClient = new GarminConnectClient();
 
+  const actividyId = process.argv[2];
+
   try {
-    const { id, name, filename, date } = await intervalsClient.getLatestActivity();
+    const { id, name, filename, date } = actividyId ? await intervalsClient.getActivityDetails(actividyId) : await intervalsClient.getLatestActivity();
+
+    if (!id || !name || !filename || !date) {
+      throw new Error(`Activity missing some data. ${JSON.stringify({ id, name, filename, date })}`);
+    }
 
     process.stdout.write(`👀 Importing activity: ${date} - ` + chalk.blue(name) + EOL);
 

@@ -155,13 +155,10 @@ export class GarminConnectClient extends GarminConnect {
     const currentMonthDate = `${year}-${month}-`;
 
     const { activityList } = await this.client.get<NewsfeedItem>(`${urlClass.GC_API}/web-gateway/newsfeed/v2?${query}`);
-    return activityList
-      .filter((activity) => activity.ownerId === ownerId && activity.startTimeLocal.startsWith(currentMonthDate))
-      .map((activity) => ({
-        activityId: activity.activityId,
-        activityName: activity.activityName,
-        startTimeLocal: activity.startTimeLocal,
-      }));
+
+    const fitleredList = activityList.filter((activity) => activity.ownerId === ownerId && activity.startTimeLocal.startsWith(currentMonthDate));
+
+    return fitleredList;
   }
 
   async likeActivity(activityId: number) {
