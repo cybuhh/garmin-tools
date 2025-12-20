@@ -36,6 +36,9 @@ import * as device from '../etc/device.json';
 
     process.stdout.write(`✅ Updated activity device to ${device.garminProduct}` + EOL);
 
+    await intervalsClient.deleteActivity(id);
+    process.stdout.write(`🧹 Removed activty from origin ${id}` + EOL);
+
     const uploadedActivityId = await gcClient.uploadActivity(filename);
     if (!uploadedActivityId) {
       throw new Error(`Error uploading activity from file ${filename}`);
@@ -58,7 +61,7 @@ import * as device from '../etc/device.json';
       return gcClient.linkGear(gear.uuid, uploadedActivityId);
     }, Promise.resolve());
 
-    process.stdout.write(`✅ Activity updated successfully` + EOL);
+    process.stdout.write(`✅ Activity gear updated successfully` + EOL);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : error;
     process.stderr.write('☠️ Error occured. ' + errorMessage + EOL);

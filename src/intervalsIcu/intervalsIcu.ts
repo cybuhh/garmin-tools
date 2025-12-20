@@ -1,6 +1,8 @@
 import { writeFile } from 'fs/promises';
 import { Activity } from '@intervals-icu/js-data-model';
 
+const API_BASE_URL = 'https://intervals.icu/api/v1';
+
 export function intervalsIcu({ apiKey, athleteId = '0' }: { apiKey: string; athleteId?: string }) {
   const headers = {
     Authorization: 'Basic ' + btoa(`API_KEY:${apiKey}`),
@@ -12,7 +14,7 @@ export function intervalsIcu({ apiKey, athleteId = '0' }: { apiKey: string; athl
    * @param activityId
    */
   async function getActivityDetails(activityId: string) {
-    const url = `https://intervals.icu/api/v1/activity/${activityId}`;
+    const url = `${API_BASE_URL}/activity/${activityId}`;
 
     const response = await fetch(url, {
       headers,
@@ -39,7 +41,7 @@ export function intervalsIcu({ apiKey, athleteId = '0' }: { apiKey: string; athl
    * @returns
    */
   async function downloadOriginalActivityFile(activityId: string, filename: string) {
-    const url = `https://intervals.icu/api/v1/activity/${activityId}/file`;
+    const url = `${API_BASE_URL}/activity/${activityId}/file`;
 
     const response = await fetch(url, {
       headers,
@@ -64,7 +66,7 @@ export function intervalsIcu({ apiKey, athleteId = '0' }: { apiKey: string; athl
       limit: String(limit),
     });
 
-    const url = `https://intervals.icu/api/v1/athlete/${athleteId}/activities?${query.toString()}`;
+    const url = `${API_BASE_URL}/athlete/${athleteId}/activities?${query.toString()}`;
 
     const response = await fetch(url, {
       headers,
@@ -76,12 +78,6 @@ export function intervalsIcu({ apiKey, athleteId = '0' }: { apiKey: string; athl
 
     return response.json() as Promise<ReadonlyArray<Activity>>;
   }
-
-  return {
-    getLatestActivity,
-    downloadOriginalActivityFile,
-    getActivityDetails,
-  };
 
   async function getLatestActivity(type = 'VirtualRide') {
     const now = new Date();
@@ -105,4 +101,25 @@ export function intervalsIcu({ apiKey, athleteId = '0' }: { apiKey: string; athl
       date: activity.start_date,
     };
   }
+
+  async function deleteActivity(id: string) {
+    const url = `${API_BASE_URL}/activity/${id}`;
+    const response = await fetch(url, {
+      headers,
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error deleting activity ${id}. HTTP status ${response.status}`);
+    }
+
+    return response.json() as Promise<ReadonlyArray<Activity>>;
+  }
+
+  return {
+    getLatestActivity,
+    downloadOriginalActivityFile,
+    getActivityDetails,
+    deleteActivity,
+  };
 }
