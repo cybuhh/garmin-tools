@@ -49,6 +49,10 @@ import * as device from '../etc/device.json';
 
     await gcClient.updateLatestActivityName(uploadedActivityId, name);
 
+    if (!presets.indoor) {
+      process.exit(0);
+    }
+
     const activityGear = await gcClient.getGear({ profileId: userProfile.profileId });
 
     await activityGear.reduce<Promise<unknown>>(async (promise, gear: GearItem) => {
