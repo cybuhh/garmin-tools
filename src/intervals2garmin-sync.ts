@@ -8,11 +8,17 @@ import * as intervalsIcuConfig from '../etc/intervals_icu_config.json';
 import * as presets from '../etc/garmin_presets.json';
 import * as device from '../etc/device.json';
 
+const KEEP_ORIGIN_OPTION = '--keep-origin';
+
 (async function main() {
   const intervalsClient = intervalsIcu(intervalsIcuConfig);
   const gcClient = new GarminConnectClient();
 
-  const actividyId = process.argv[2];
+  const args = process.argv.slice(2);
+
+  const isKeepOrigin = args.includes(KEEP_ORIGIN_OPTION);
+
+  const actividyId = isKeepOrigin ? args.filter((arg) => arg !== KEEP_ORIGIN_OPTION).slice(-1)[0] : args[args.length - 1];
 
   try {
     const { id, name, filename, date } = actividyId ? await intervalsClient.getActivityDetails(actividyId) : await intervalsClient.getLatestActivity();
@@ -36,8 +42,10 @@ import * as device from '../etc/device.json';
 
     process.stdout.write(`✅ Updated activity device to ${device.garminProduct}` + EOL);
 
-    await intervalsClient.deleteActivity(id);
-    process.stdout.write(`🧹 Removed activty from origin ${id}` + EOL);
+    if (!isKeepOrigin) {
+      await intervalsClient.deleteActivity(id);
+      process.stdout.write(`🧹 Removed activty from origin ${id}` + EOL);
+    }
 
     const uploadedActivityId = await gcClient.uploadActivity(filename);
     if (!uploadedActivityId) {
@@ -49,23 +57,23 @@ import * as device from '../etc/device.json';
 
     await gcClient.updateLatestActivityName(uploadedActivityId, name);
 
-    if (!presets.indoor) {
-      process.exit(0);
+    if ('indoor' in presets && presets.indoor) {
+      const { indoor: indoorPreset } = presets;
+
+      const activityGear = await gcClient.getGear({ profileId: userProfile.profileId });
+
+      await activityGear.reduce<Promise<unknown>>(async (promise, gear: GearItem) => {
+        await promise;
+        return gcClient.unlinkGear(gear.uuid, uploadedActivityId);
+      }, Promise.resolve());
+
+      await indoorPreset.reduce<Promise<unknown>>(async (promise, gear: GearItem) => {
+        await promise;
+        return gcClient.linkGear(gear.uuid, uploadedActivityId);
+      }, Promise.resolve());
+
+      process.stdout.write(`✅ Activity gear updated successfully` + EOL);
     }
-
-    const activityGear = await gcClient.getGear({ profileId: userProfile.profileId });
-
-    await activityGear.reduce<Promise<unknown>>(async (promise, gear: GearItem) => {
-      await promise;
-      return gcClient.unlinkGear(gear.uuid, uploadedActivityId);
-    }, Promise.resolve());
-
-    await presets.indoor.reduce<Promise<unknown>>(async (promise, gear: GearItem) => {
-      await promise;
-      return gcClient.linkGear(gear.uuid, uploadedActivityId);
-    }, Promise.resolve());
-
-    process.stdout.write(`✅ Activity gear updated successfully` + EOL);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : error;
     process.stderr.write('☠️ Error occured. ' + errorMessage + EOL);
