@@ -47,7 +47,7 @@ export class GarminConnectClient extends GarminConnect {
     try {
       this.loadTokenByFile(TOKENS_PATH);
     } catch {
-      this.regenerateToken();
+      return this.regenerateToken();
     }
   }
 

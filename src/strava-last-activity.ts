@@ -9,13 +9,16 @@ const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
   const stravaClient = new StravaClient(stravaConfigPath, stravaConfig);
 
   try {
-    const latestStravaActivity = await stravaClient.getLatestActivity();
-    if (!latestStravaActivity) {
+    const { id, name } = await stravaClient.getLatestActivity();
+    if (!id || !name) {
       process.stdout.write('Failed to fetch strava data' + EOL);
       process.exit(1);
     }
 
-    process.stdout.write(`Latest strava activity name: ${latestStravaActivity.name}` + EOL);
+    const activityPhoto = await stravaClient.getActivityPhoto(id);
+
+    process.stdout.write(`Latest strava activity name: ${name}` + EOL);
+    process.stdout.write(`Latest strava activity photo: ${activityPhoto}` + EOL);
   } catch (error) {
     if (error instanceof Error && 'statusCode' in error && error.statusCode === 401) {
       process.stdout.write('👀 Refreshing token' + EOL);
