@@ -15,6 +15,17 @@ export interface GearItem {
   displayName: string;
 }
 
+interface AddPhotoResponse {
+  imageId: string;
+  url: string;
+  smallUrl: string;
+  mediumUrl: string;
+  expirationTimestamp: number;
+  latitude: null;
+  longitude: null;
+  photoDate: null;
+}
+
 interface UploadActivityResponse {
   detailedImportResult: {
     uploadId: number;
@@ -163,6 +174,12 @@ export class GarminConnectClient extends GarminConnect {
 
   async likeActivity(activityId: number) {
     return this.client.post<{}>(`${urlClass.GC_API}/conversation-service/conversation/like/ACTIVITY/${activityId}`, {});
+  }
+
+  async addPhoto(activityId: number, imageBlob: Blob) {
+    const formData = new FormData();
+    formData.append('file', imageBlob, 'image.jpg');
+    return this.client.post<AddPhotoResponse>(`${urlClass.GC_API}/activity-service/activity/${activityId}/image`, formData);
   }
 }
 interface NewsfeedItem {

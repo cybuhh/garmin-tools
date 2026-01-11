@@ -6,6 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "garmin-likes": "ts-node -r tsconfig-paths/register src/garmin-likes",
+    "garmin-sync-photo": "ts-node -r tsconfig-paths/register src/garmin-sync-photo-from-strava",
     "strava2garmin-sync": "ts-node -r tsconfig-paths/register src/strava2garmin-sync",
     "mywhoosh2garmin-upload": "ts-node -r tsconfig-paths/register src/mywhoosh2garmin-upload",
     "intervals2garmin-sync": "ts-node -r tsconfig-paths/register src/intervals2garmin-sync",
