@@ -73,6 +73,10 @@ export class StravaClient {
     }
   }
 
+  async getActivity(id: string): Promise<DetailedActivityResponse> {
+    return await this.client.activities.get({ id });
+  }
+
   async getLatestActivity(): Promise<DetailedActivityResponse> {
     const [activity] = await this.client.athlete.listActivities({ page: 1, per_page: 1 });
     return activity;
