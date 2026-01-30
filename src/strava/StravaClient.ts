@@ -27,6 +27,7 @@ interface ActivityPhotos {
 }
 
 /**
+ * @url https://github.com/node-strava/node-strava-v3
  * @url https://www.strava.com/oauth/authorize?client_id=...&response_type=code&redirect_uri=http://localhost/exchange_token&approval_prompt=force&scope=activity:read
  * @url https://developers.strava.com/docs/reference/#api-Routes-getRouteAsGPX
  * @url https://www.strava.com/activities/__ACTIVITY_ID__/export_original
@@ -43,6 +44,10 @@ export class StravaClient {
     this.client = new strava.client(config.access_token);
   }
 
+  async getAthlete() {
+    return this.client.athlete.get({});
+  }
+
   async tokenRefresh() {
     try {
       const { refresh_token } = this.config;
@@ -55,6 +60,8 @@ export class StravaClient {
       };
 
       await fs.writeFile(this.configPath, JSON.stringify(newConfig));
+      this.config = newConfig;
+      this.client = new strava.client(newToken.access_token);
       process.stdout.write('New token stored' + EOL);
     } catch (e) {
       process.stdout.write('Token refresh error' + EOL);

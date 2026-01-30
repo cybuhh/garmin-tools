@@ -42,11 +42,6 @@ const KEEP_ORIGIN_OPTION = '--keep-origin';
 
     process.stdout.write(`✅ Updated activity device to ${device.garminProduct}` + EOL);
 
-    if (!isKeepOrigin) {
-      await intervalsClient.deleteActivity(id);
-      process.stdout.write(`🧹 Removed activty from origin ${id}` + EOL);
-    }
-
     const uploadedActivityId = await gcClient.uploadActivity(filename);
     if (!uploadedActivityId) {
       throw new Error(`Error uploading activity from file ${filename}`);
@@ -54,6 +49,11 @@ const KEEP_ORIGIN_OPTION = '--keep-origin';
     await unlink(filename);
     await unlink(backupFilename);
     process.stdout.write(`✅ Activity uploaded with id ${uploadedActivityId}` + EOL);
+
+    if (!isKeepOrigin) {
+      await intervalsClient.deleteActivity(id);
+      process.stdout.write(`🧹 Removed activity from origin ${id}` + EOL);
+    }
 
     await gcClient.updateLatestActivityName(uploadedActivityId, name);
 
