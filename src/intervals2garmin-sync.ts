@@ -8,7 +8,7 @@ import * as intervalsIcuConfig from '../etc/intervals_icu_config.json';
 import * as presets from '../etc/garmin_presets.json';
 import * as device from '../etc/device.json';
 
-const KEEP_ORIGIN_OPTION = '--keep-origin';
+const REMOVE_ORIGIN_OPTION = '--remove-origin';
 
 (async function main() {
   const intervalsClient = intervalsIcu(intervalsIcuConfig);
@@ -16,9 +16,9 @@ const KEEP_ORIGIN_OPTION = '--keep-origin';
 
   const args = process.argv.slice(2);
 
-  const isKeepOrigin = args.includes(KEEP_ORIGIN_OPTION);
+  const isRemoveOrigin = args.includes(REMOVE_ORIGIN_OPTION);
 
-  const actividyId = isKeepOrigin ? args.filter((arg) => arg !== KEEP_ORIGIN_OPTION).slice(-1)[0] : args[args.length - 1];
+  const actividyId = isRemoveOrigin ? args.filter((arg) => arg !== REMOVE_ORIGIN_OPTION).slice(-1)[0] : args[args.length - 1];
 
   try {
     const { id, name, filename, date } = actividyId ? await intervalsClient.getActivityDetails(actividyId) : await intervalsClient.getLatestActivity();
@@ -42,11 +42,6 @@ const KEEP_ORIGIN_OPTION = '--keep-origin';
 
     process.stdout.write(`✅ Updated activity device to ${device.garminProduct}` + EOL);
 
-    if (!isKeepOrigin) {
-      await intervalsClient.deleteActivity(id);
-      process.stdout.write(`🧹 Removed activty from origin ${id}` + EOL);
-    }
-
     const uploadedActivityId = await gcClient.uploadActivity(filename);
     if (!uploadedActivityId) {
       throw new Error(`Error uploading activity from file ${filename}`);
@@ -54,6 +49,11 @@ const KEEP_ORIGIN_OPTION = '--keep-origin';
     await unlink(filename);
     await unlink(backupFilename);
     process.stdout.write(`✅ Activity uploaded with id ${uploadedActivityId}` + EOL);
+
+    if (isRemoveOrigin) {
+      await intervalsClient.deleteActivity(id);
+      process.stdout.write(`🧹 Removed activity from origin ${id}` + EOL);
+    }
 
     await gcClient.updateLatestActivityName(uploadedActivityId, name);
 

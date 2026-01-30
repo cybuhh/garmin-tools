@@ -11,6 +11,16 @@ const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
   const gcClient = new GarminConnectClient();
 
   try {
+    await stravaClient.getAthlete();
+  } catch (error) {
+    if (error instanceof Error && 'statusCode' in error && error.statusCode === 401) {
+      process.stdout.write('👀 Refreshing token' + EOL);
+      await stravaClient.tokenRefresh();
+      process.stdout.write('✅ Strava Token refreshed.');
+    }
+  }
+
+  try {
     await gcClient.initialize();
     const [{ activityId, activityName }] = await gcClient.getActivities(0, 1);
 
