@@ -1,5 +1,6 @@
 import { readActivityDevice } from 'fit/readActivity';
 
 (async function main() {
-  await readActivityDevice('./activity.fit');
+  const [filename] = process.argv.slice(2);
+  await readActivityDevice(filename);
 })();
