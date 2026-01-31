@@ -22,15 +22,19 @@ const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
 
   try {
     await gcClient.initialize();
-    const [{ activityId, activityName }] = await gcClient.getActivities(0, 1);
 
-    const { id, name } = await stravaClient.getLatestActivity();
-    if (!id || !name) {
-      process.stdout.write('Failed to fetch strava data' + EOL);
-      process.exit(1);
+    const args = process.argv.slice(2);
+    const garminActivityIdParam = Number(args[0]);
+    const stravaActivityIdParam = args[1];
+
+    const { activityId, activityName } = garminActivityIdParam ? await gcClient.getActivity({ activityId: garminActivityIdParam }) : (await gcClient.getActivities(0, 1))[0];
+
+    const { id: stravaActivityId, name: stravaActivityName } = stravaActivityIdParam ? await stravaClient.getActivity(stravaActivityIdParam) : await stravaClient.getLatestActivity();
+    if (!stravaActivityId || !stravaActivityName) {
+      throw Error('Failed to fetch strava data' + EOL);
     }
 
-    const activityPhoto = await stravaClient.getActivityPhoto(id);
+    const activityPhoto = await stravaClient.getActivityPhoto(stravaActivityIdParam);
 
     const imageResponse = await fetch(activityPhoto);
     if (!imageResponse.ok) {
@@ -39,7 +43,7 @@ const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
     const imageBlob = await imageResponse.blob();
     const result = await gcClient.addPhoto(activityId, imageBlob);
 
-    process.stdout.write(`Latest strava activity name: ${name}` + EOL);
+    process.stdout.write(`Latest strava activity name: ${stravaActivityName}` + EOL);
     process.stdout.write(`Latest strava activity photo: ${activityPhoto}` + EOL);
     process.stdout.write(`Latest garmin activity name: ${activityName}` + EOL);
     process.stdout.write(`Uploaded image id: ${result.imageId}` + EOL);
