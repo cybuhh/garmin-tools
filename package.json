@@ -5,12 +5,12 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "fit-read-device": "ts-node -r tsconfig-paths/register src/fit-read-device.ts",
-    "garmin-likes": "ts-node -r tsconfig-paths/register src/garmin-likes",
-    "garmin-sync-photo": "ts-node -r tsconfig-paths/register src/garmin-sync-photo-from-strava",
-    "strava2garmin-sync": "ts-node -r tsconfig-paths/register src/strava2garmin-sync",
-    "mywhoosh2garmin-upload": "ts-node -r tsconfig-paths/register src/mywhoosh2garmin-upload",
-    "intervals2garmin-sync": "ts-node -r tsconfig-paths/register src/intervals2garmin-sync",
+    "fit-read-device": "bun run src/fit-read-device.ts",
+    "garmin-likes": "bun run src/garmin-likes",
+    "garmin-sync-photo": "bun runs rc/garmin-sync-photo-from-strava",
+    "strava2garmin-sync": "bun runs rc/strava2garmin-sync",
+    "mywhoosh2garmin-upload": "bun run src/mywhoosh2garmin-upload",
+    "intervals2garmin-sync": "bun run src/intervals2garmin-sync",
     "strava-last-activity": "nodemon --config strava-last-activity.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint"
