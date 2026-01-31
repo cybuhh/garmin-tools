@@ -11,7 +11,8 @@
     "strava2garmin-sync": "bun runs rc/strava2garmin-sync",
     "mywhoosh2garmin-upload": "bun run src/mywhoosh2garmin-upload",
     "intervals2garmin-sync": "bun run src/intervals2garmin-sync",
-    "strava-last-activity": "nodemon --config strava-last-activity.json",
+    "strava-last-activity": "bun run src/strava-last-activity.ts",
+    "strava-last-activity-watch": "nodemon --config strava-last-activity.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint"
   },
@@ -29,13 +30,16 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.38.0",
+    "@types/bun": "^1.3.8",
     "@types/unzipper": "^0.10.10",
     "eslint": "^9.38.0",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
-    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
   }
 }
