@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
+    "fit-read-device": "ts-node -r tsconfig-paths/register src/fit-read-device.ts",
     "garmin-likes": "ts-node -r tsconfig-paths/register src/garmin-likes",
     "garmin-sync-photo": "ts-node -r tsconfig-paths/register src/garmin-sync-photo-from-strava",
     "strava2garmin-sync": "ts-node -r tsconfig-paths/register src/strava2garmin-sync",
