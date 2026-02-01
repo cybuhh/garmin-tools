@@ -1,8 +1,8 @@
 import { getLastestActivityFile } from 'services/mywhoosh/getLastestActivityFile';
 import { getDataPath } from 'services/mywhoosh/getDataPath';
 import { GarminConnectClient, GearItem } from 'services/garmin/client';
-import * as presets from '../etc/garmin_presets.json';
-import * as stravaConfig from '../etc/strava_config.json';
+import * as presets from '../../etc/garmin_presets.json';
+import * as stravaConfig from '../../etc/strava_config.json';
 import * as path from 'path';
 import { StravaClient } from 'strava/StravaClient';
 import { logErrorMessage, logSuccessMessage, logMessage, logVerboseMessage } from 'utils/log';

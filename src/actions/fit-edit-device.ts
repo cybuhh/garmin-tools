@@ -1,7 +1,7 @@
 import { rename } from 'fs/promises';
 import { createChangedActivity } from 'services/fit/createChangedActivity';
 import { logSuccessMessage } from 'utils/log';
-import * as device from '../etc/device.json';
+import * as device from '../../etc/device.json';
 
 (async function main() {
   const args = process.argv.slice(2);

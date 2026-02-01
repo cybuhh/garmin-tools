@@ -5,9 +5,9 @@ import { getGarminClient, GearItem } from 'services/garmin/client';
 import { intervalsIcu } from 'services/intervalsIcu/intervalsIcu';
 import { createChangedActivity } from 'services/fit/createChangedActivity';
 import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
-import * as intervalsIcuConfig from '../etc/intervals_icu_config.json';
-import * as presets from '../etc/garmin_presets.json';
-import * as device from '../etc/device.json';
+import * as intervalsIcuConfig from '../../etc/intervals_icu_config.json';
+import * as presets from '../../etc/garmin_presets.json';
+import * as device from '../../etc/device.json';
 
 const REMOVE_ORIGIN_OPTION = '--remove-origin';
 
