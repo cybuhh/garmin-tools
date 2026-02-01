@@ -1,6 +1,7 @@
+import { exit } from 'process';
 import delay from 'common/delay';
-import { GarminConnectClient } from 'garmin/client';
-import { EOL } from 'os';
+import { getGarminClient } from 'services/garmin/client';
+import { logErrorMessage, logMessage, logVerboseMessage } from 'common/log';
 
 const REQUEST_DELAY = 5000;
 
@@ -8,16 +9,14 @@ const REQUEST_DELAY = 5000;
   const userId = Number(process.argv[2]);
 
   if (!userId) {
-    process.stdout.write(`☠️ Missing userId` + EOL);
-    process.exit(1);
+    logErrorMessage('Missing userId');
+    exit(1);
   }
 
-  const gcClient = new GarminConnectClient();
-
   try {
-    await gcClient.initialize();
+    const gcClient = await getGarminClient();
     const userDetails = await gcClient.getSocialProfile(userId);
-    process.stdout.write(`👀 ${userDetails.fullName}` + EOL);
+    logVerboseMessage(userDetails.fullName);
 
     const newsFeed = await gcClient.getActivitiesFromNewsfeed(userId);
 
@@ -25,14 +24,13 @@ const REQUEST_DELAY = 5000;
       async (acc, activity) => {
         await acc;
         await delay(REQUEST_DELAY);
-        process.stdout.write(`👍 like on ${activity.startTimeLocal} ${activity.activityId} - ${activity.activityName}` + EOL);
+        logMessage(`👍 like on ${activity.startTimeLocal} ${activity.activityId} - ${activity.activityName}`);
         return gcClient.likeActivity(activity.activityId);
       },
       Promise.resolve() as unknown as Promise<{}>
     );
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : error;
-    process.stderr.write('☠️ Error occured. ' + errorMessage + EOL);
-    process.exit(1);
+    logErrorMessage(error);
+    exit(1);
   }
 })();

@@ -1,5 +1,5 @@
-import { GarminConnectClient, GearItem } from 'garmin/client';
-import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
+import { GarminConnectClient, GearItem } from 'services/garmin/client';
+import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'common/log';
 import { exit, argv } from 'process';
 
 (async function main() {
@@ -25,8 +25,7 @@ import { exit, argv } from 'process';
 
     logSuccessMessage('Activity uploaded with id ' + uploadedActivityId);
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : error;
-    logErrorMessage(errorMessage);
+    logErrorMessage(error);
     exit(1);
   }
 })();

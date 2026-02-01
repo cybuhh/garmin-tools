@@ -1,8 +1,8 @@
-import { GarminConnectClient } from 'garmin/client';
+import { GarminConnectClient } from 'services/garmin/client';
 import * as path from 'path';
 import { StravaClient } from 'strava/StravaClient';
 import * as stravaConfig from '../etc/strava_config.json';
-import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
+import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'common/log';
 import { exit, argv, cwd } from 'process';
 
 const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
@@ -53,8 +53,7 @@ const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
       await stravaClient.tokenRefresh();
       logSuccessMessage('Token refreshed. Please re-run app.');
     }
-    const errorMessage = error instanceof Error ? error.message : error;
-    logErrorMessage(errorMessage);
+    logErrorMessage(error);
     exit(1);
   }
 })();

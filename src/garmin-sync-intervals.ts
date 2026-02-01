@@ -1,19 +1,18 @@
 import chalk from 'chalk';
 import { unlink, rename } from 'fs/promises';
-import { GarminConnectClient, GearItem } from 'garmin/client';
-import { intervalsIcu } from 'intervalsIcu/intervalsIcu';
+import { exit, argv } from 'process';
+import { getGarminClient, GearItem } from 'services/garmin/client';
+import { intervalsIcu } from 'services/intervalsIcu/intervalsIcu';
 import { createChangedActivity } from 'fit/createChangedActivity';
+import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'common/log';
 import * as intervalsIcuConfig from '../etc/intervals_icu_config.json';
 import * as presets from '../etc/garmin_presets.json';
 import * as device from '../etc/device.json';
-import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
-import { exit, argv } from 'process';
 
 const REMOVE_ORIGIN_OPTION = '--remove-origin';
 
 (async function main() {
   const intervalsClient = intervalsIcu(intervalsIcuConfig);
-  const gcClient = new GarminConnectClient();
 
   const args = argv.slice(2);
 
@@ -34,7 +33,7 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
     await intervalsClient.downloadOriginalActivityFile(id, activityFilename);
     logSuccessMessage('Activity imported to file: ' + chalk.blue(activityFilename));
 
-    await gcClient.initialize();
+    const gcClient = await getGarminClient();
     const userProfile = await gcClient.getUserProfile();
     logVerboseMessage('Garmin user  ' + userProfile.userProfileFullName);
 
@@ -78,8 +77,7 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
       logSuccessMessage('Activity gear updated successfully' + device.garminProduct);
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : error;
-    logErrorMessage(errorMessage);
+    logErrorMessage(error);
     exit(1);
   }
 })();

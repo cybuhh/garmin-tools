@@ -13,6 +13,7 @@
     "garmin-upload-mywhoosh": "bun run src/garmin-upload-mywhoosh",
     "garmin-sync-intervals": "bun run src/garmin-sync-intervals",
     "garmin-upload": "bun run src/garmin-upload",
+    "garmin-last-activity": "bun run src/garmin-last-activity.ts",
     "strava-last-activity": "bun run src/strava-last-activity.ts",
     "strava-last-activity-watch": "nodemon --config strava-last-activity.json",
     "test": "echo \"Error: no test specified\" && exit 1",

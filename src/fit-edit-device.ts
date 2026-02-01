@@ -1,6 +1,6 @@
-import { EOL } from 'os';
 import { rename } from 'fs/promises';
 import { createChangedActivity } from 'fit/createChangedActivity';
+import { logSuccessMessage } from 'common/log';
 import * as device from '../etc/device.json';
 
 (async function main() {
@@ -11,5 +11,5 @@ import * as device from '../etc/device.json';
   await rename(filename, backupFilename);
 
   await createChangedActivity(backupFilename, filename, device);
-  process.stdout.write(`✅ Updated activity device to ${device.garminProduct}` + EOL);
+  logSuccessMessage(`Updated activity device to ${device.garminProduct}`);
 })();

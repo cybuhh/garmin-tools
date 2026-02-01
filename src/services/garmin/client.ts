@@ -5,7 +5,7 @@ import * as path from 'path';
 import { readFile } from 'fs/promises';
 import { stdin as input, stdout as output } from 'process';
 import { UrlClass } from 'garmin-connect/dist/garmin/UrlClass';
-import { UploadFileTypeTypeValue, UploadFileType, IActivity, IUserInfo, ISocialProfile } from 'garmin-connect/dist/garmin/types';
+import { UploadFileTypeTypeValue, UploadFileType, IActivity, ISocialProfile } from 'garmin-connect/dist/garmin/types';
 import delay from '../common/delay';
 
 const TOKENS_PATH = 'oauth_tokens';
@@ -187,4 +187,9 @@ export class GarminConnectClient extends GarminConnect {
 }
 interface NewsfeedItem {
   activityList: ReadonlyArray<IActivity>;
+}
+
+export function getGarminClient(username?: string, password?: string) {
+  const gcClient = new GarminConnectClient({ username, password });
+  return gcClient.initialize().then(() => gcClient);
 }

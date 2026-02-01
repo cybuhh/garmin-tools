@@ -1,16 +1,14 @@
-import { GarminConnectClient } from 'garmin/client';
-import { EOL } from 'os';
+import { getGarminClient } from 'services/garmin/client';
+import { logErrorMessage, logMessage } from 'common/log';
+import { exit } from 'process';
 
 (async function main() {
-  const gcClient = new GarminConnectClient();
-
   try {
-    await gcClient.initialize();
+    const gcClient = await getGarminClient();
     const activities = await gcClient.getActivities(0, 1);
-    process.stdout.write([JSON.stringify(activities[0])] + EOL);
+    logMessage(JSON.stringify(activities[0]));
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : error;
-    process.stderr.write('☠️ Error occured. ' + errorMessage + EOL);
-    process.exit(1);
+    logErrorMessage(error);
+    exit(1);
   }
 })();

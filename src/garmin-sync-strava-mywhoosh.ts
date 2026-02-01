@@ -1,11 +1,11 @@
-import { getLastestActivityFile } from 'mywhoosh/getLastestActivityFile';
-import { getDataPath } from 'mywhoosh/getDataPath';
-import { GarminConnectClient, GearItem } from 'garmin/client';
+import { getLastestActivityFile } from 'services/mywhoosh/getLastestActivityFile';
+import { getDataPath } from 'services/mywhoosh/getDataPath';
+import { GarminConnectClient, GearItem } from 'services/garmin/client';
 import * as presets from '../etc/garmin_presets.json';
 import * as stravaConfig from '../etc/strava_config.json';
 import * as path from 'path';
 import { StravaClient } from 'strava/StravaClient';
-import { logErrorMessage, logSuccessMessage, logMessage, logVerboseMessage } from 'utils/log';
+import { logErrorMessage, logSuccessMessage, logMessage, logVerboseMessage } from 'common/log';
 import { exit, cwd } from 'process';
 
 const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
@@ -27,7 +27,7 @@ const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
 
   try {
     const latestActivityFile = await getLastestActivityFile(myWhooshDataPath);
-    logSuccessMessage(`✅ Latest activity file found: ${latestActivityFile}`);
+    logSuccessMessage(`Latest activity file found: ${latestActivityFile}`);
 
     const latestStravaActivity = await stravaClient.getLatestActivity();
 
@@ -65,7 +65,7 @@ const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
       logSuccessMessage('Token refreshed. Please re-run app.');
       exit(0);
     }
-    logErrorMessage(error instanceof Error ? error.message : error);
+    logErrorMessage(error);
     exit(1);
   }
 })();

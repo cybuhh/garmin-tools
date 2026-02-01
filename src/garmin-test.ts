@@ -1,12 +1,13 @@
-import { GarminConnectClient } from 'garmin/client';
+import { logErrorMessage, logMessage } from 'common/log';
+import { GarminConnectClient } from 'services/garmin/client';
 
 (async function main() {
   const gcClient = new GarminConnectClient();
   try {
     await gcClient.initialize();
     const userProfile = await gcClient.getUserProfile();
-    console.log(`user: ${userProfile.fullName}`);
+    logMessage(`user: ${userProfile.fullName}`);
   } catch (error) {
-    console.error(error);
+    logErrorMessage(error);
   }
 })();
