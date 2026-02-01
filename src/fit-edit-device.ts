@@ -1,6 +1,6 @@
 import { rename } from 'fs/promises';
-import { createChangedActivity } from 'fit/createChangedActivity';
-import { logSuccessMessage } from 'common/log';
+import { createChangedActivity } from 'services/fit/createChangedActivity';
+import { logSuccessMessage } from 'utils/log';
 import * as device from '../etc/device.json';
 
 (async function main() {

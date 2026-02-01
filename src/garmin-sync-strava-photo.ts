@@ -2,7 +2,7 @@ import { GarminConnectClient } from 'services/garmin/client';
 import * as path from 'path';
 import { StravaClient } from 'strava/StravaClient';
 import * as stravaConfig from '../etc/strava_config.json';
-import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'common/log';
+import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
 import { exit, argv, cwd } from 'process';
 
 const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');

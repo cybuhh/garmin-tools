@@ -1,5 +1,5 @@
 import { getGarminClient } from 'services/garmin/client';
-import { logErrorMessage, logMessage } from 'common/log';
+import { logErrorMessage, logMessage } from 'utils/log';
 import { exit } from 'process';
 
 (async function main() {

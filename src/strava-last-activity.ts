@@ -2,7 +2,7 @@ import * as path from 'path';
 import { exit } from 'process';
 import { StravaClient } from 'strava/StravaClient';
 import * as stravaConfig from '../etc/strava_config.json';
-import { logErrorMessage, logMessage, logSuccessMessage, logVerboseMessage } from 'common/log';
+import { logErrorMessage, logMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
 
 const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
 

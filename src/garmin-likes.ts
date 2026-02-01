@@ -1,7 +1,7 @@
 import { exit } from 'process';
-import delay from 'common/delay';
+import delay from 'utils/delay';
 import { getGarminClient } from 'services/garmin/client';
-import { logErrorMessage, logMessage, logVerboseMessage } from 'common/log';
+import { logErrorMessage, logMessage, logVerboseMessage } from 'utils/log';
 
 const REQUEST_DELAY = 5000;
 

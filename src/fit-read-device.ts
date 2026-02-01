@@ -1,4 +1,4 @@
-import { readActivityDevice } from 'fit/readActivity';
+import { readActivityDevice } from 'services/fit/readActivity';
 
 (async function main() {
   const [filename] = process.argv.slice(2);

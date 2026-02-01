@@ -2,7 +2,7 @@ import { exit } from 'process';
 import { getLastestActivityFile } from 'services/mywhoosh/getLastestActivityFile';
 import { getDataPath } from 'services/mywhoosh/getDataPath';
 import { GarminConnectClient } from 'services/garmin/client';
-import { logErrorMessage, logSuccessMessage } from 'common/log';
+import { logErrorMessage, logSuccessMessage } from 'utils/log';
 
 (async function main() {
   const gcClient = new GarminConnectClient();

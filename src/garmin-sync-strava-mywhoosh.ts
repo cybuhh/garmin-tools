@@ -5,7 +5,7 @@ import * as presets from '../etc/garmin_presets.json';
 import * as stravaConfig from '../etc/strava_config.json';
 import * as path from 'path';
 import { StravaClient } from 'strava/StravaClient';
-import { logErrorMessage, logSuccessMessage, logMessage, logVerboseMessage } from 'common/log';
+import { logErrorMessage, logSuccessMessage, logMessage, logVerboseMessage } from 'utils/log';
 import { exit, cwd } from 'process';
 
 const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');

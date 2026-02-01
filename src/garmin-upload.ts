@@ -1,5 +1,5 @@
 import { GarminConnectClient, GearItem } from 'services/garmin/client';
-import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'common/log';
+import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
 import { exit, argv } from 'process';
 
 (async function main() {

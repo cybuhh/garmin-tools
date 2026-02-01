@@ -1,4 +1,4 @@
-import { logErrorMessage, logMessage } from 'common/log';
+import { logErrorMessage, logMessage } from 'utils/log';
 import { GarminConnectClient } from 'services/garmin/client';
 
 (async function main() {
