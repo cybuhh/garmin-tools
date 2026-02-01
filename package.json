@@ -8,7 +8,7 @@
     "fit-edit-device": "bun run src/fit-edit-device.ts",
     "fit-read-device": "bun run src/fit-read-device.ts",
     "garmin-likes": "bun run src/garmin-likes",
-    "garmin-sync-photo": "bun run src/garmin-sync-photo-from-strava",
+    "garmin-sync-strava-photo": "bun run src/garmin-sync-strava-photo",
     "garmin-sync-strava-mywhoosh": "bun run src/garmin-sync-strava-mywhoosh",
     "garmin-upload-mywhoosh": "bun run src/garmin-upload-mywhoosh",
     "garmin-sync-intervals": "bun run src/garmin-sync-intervals",

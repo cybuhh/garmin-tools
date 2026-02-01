@@ -30,24 +30,26 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
 
     logVerboseMessage(`Importing activity: ${date} - ` + chalk.blue(name));
 
-    await intervalsClient.downloadOriginalActivityFile(id, filename);
-    logSuccessMessage('Activity imported to file: ' + chalk.blue(filename));
+    const activityFilename = filename.endsWith('.fit') ? filename : `${filename}.fit`;
+    await intervalsClient.downloadOriginalActivityFile(id, activityFilename);
+    logSuccessMessage('Activity imported to file: ' + chalk.blue(activityFilename));
 
     await gcClient.initialize();
     const userProfile = await gcClient.getUserProfile();
     logVerboseMessage('Garmin user  ' + userProfile.userProfileFullName);
 
-    const backupFilename = `${filename}.bak`;
-    await rename(filename, backupFilename);
-    await createChangedActivity(backupFilename, filename, device);
+    const backupFilename = `${activityFilename}.bak`;
+    await rename(activityFilename, backupFilename);
+    await createChangedActivity(backupFilename, activityFilename, device);
 
     logSuccessMessage('Updated activity device to  ' + device.garminProduct);
 
-    const uploadedActivityId = await gcClient.uploadActivity(filename);
+    const uploadedActivityId = await gcClient.uploadActivity(activityFilename);
     if (!uploadedActivityId) {
-      throw new Error(`Error uploading activity from file ${filename}`);
+      throw new Error(`Error uploading activity from file ${activityFilename}`);
     }
-    await unlink(filename);
+
+    await unlink(activityFilename);
     await unlink(backupFilename);
     logSuccessMessage('Activity uploaded with id ' + uploadedActivityId);
 

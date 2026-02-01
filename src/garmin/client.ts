@@ -128,7 +128,10 @@ export class GarminConnectClient extends GarminConnect {
     const form = new FormData();
     form.append('userfile', blob);
 
-    const { headers } = await this.client.client.post(urlClass.UPLOAD + '.' + format, form, {
+    // https://connectapi.garmin.com/upload-service/upload/.fit
+    const uploadUrl = `${urlClass.UPLOAD}.${format}`;
+
+    const { headers } = await this.client.client.post(uploadUrl, form, {
       headers: {
         'Content-Type': 'multipart/form-data;',
       },

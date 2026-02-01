@@ -13,6 +13,15 @@ const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
 (async function main() {
   const myWhooshDataPath = getDataPath();
   const stravaClient = new StravaClient(stravaConfigPath, stravaConfig);
+  try {
+    await stravaClient.getAthlete();
+  } catch (error) {
+    if (error instanceof Error && 'statusCode' in error && error.statusCode === 401) {
+      logVerboseMessage('Refreshing token');
+      await stravaClient.tokenRefresh();
+      logSuccessMessage('Strava Token refreshed.');
+    }
+  }
 
   const gcClient = new GarminConnectClient();
 
