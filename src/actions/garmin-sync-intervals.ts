@@ -5,6 +5,7 @@ import { getGarminClient, GearItem } from 'services/garmin/client';
 import { intervalsIcu } from 'services/intervalsIcu/intervalsIcu';
 import { createChangedActivity } from 'services/fit/createChangedActivity';
 import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
+import { createTmpPathIfNotExists, getTmpPath } from 'utils/fs';
 import * as intervalsIcuConfig from '../../etc/intervals_icu_config.json';
 import * as presets from '../../etc/garmin_presets.json';
 import * as device from '../../etc/device.json';
@@ -29,7 +30,9 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
 
     logVerboseMessage(`Importing activity: ${date} - ` + chalk.blue(name));
 
-    const activityFilename = filename.endsWith('.fit') ? filename : `${filename}.fit`;
+    await createTmpPathIfNotExists();
+    const activityFilename = getTmpPath(filename.endsWith('.fit') ? filename : `${filename}.fit`);
+
     await intervalsClient.downloadOriginalActivityFile(id, activityFilename);
     logSuccessMessage('Activity imported to file: ' + chalk.blue(activityFilename));
 

@@ -9,3 +9,4 @@ oauth_tokens
 node_modules
 dist
 device.json
+_tmp_/
