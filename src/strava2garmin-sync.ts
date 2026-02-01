@@ -4,10 +4,11 @@ import { GarminConnectClient, GearItem } from 'garmin/client';
 import * as presets from '../etc/garmin_presets.json';
 import * as stravaConfig from '../etc/strava_config.json';
 import * as path from 'path';
-import { EOL } from 'os';
 import { StravaClient } from 'strava/StravaClient';
+import { logErrorMessage, logSuccessMessage, logMessage, logVerboseMessage } from 'utils/log';
+import { exit, cwd } from 'process';
 
-const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
+const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
 
 (async function main() {
   const myWhooshDataPath = getDataPath();
@@ -17,7 +18,7 @@ const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
 
   try {
     const latestActivityFile = await getLastestActivityFile(myWhooshDataPath);
-    process.stdout.write(`✅ Latest activity file found: ${latestActivityFile}` + EOL);
+    logSuccessMessage(`✅ Latest activity file found: ${latestActivityFile}`);
 
     const latestStravaActivity = await stravaClient.getLatestActivity();
 
@@ -25,7 +26,7 @@ const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
       throw new Error('Failed to load latest strava activity');
     }
 
-    process.stdout.write(`Latest strava activity name: ${latestStravaActivity.name}` + EOL);
+    logMessage(`Latest strava activity name: ${latestStravaActivity.name}`);
 
     await gcClient.initialize();
     const userProfile = await gcClient.getUserProfile();
@@ -33,7 +34,7 @@ const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
     if (!uploadedActivityId) {
       throw new Error(`Error uploading activity from file ${latestActivityFile}`);
     }
-    process.stdout.write(`✅ Activity uploaded with id ${uploadedActivityId}` + EOL);
+    logSuccessMessage(`Activity uploaded with id ${uploadedActivityId}`);
 
     await gcClient.updateLatestActivityName(uploadedActivityId, latestStravaActivity.name);
 
@@ -50,12 +51,12 @@ const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
     }, Promise.resolve());
   } catch (error) {
     if (error instanceof Error && 'statusCode' in error && error.statusCode === 401) {
-      process.stdout.write('👀 Refreshing token' + EOL);
+      logVerboseMessage('Refreshing token');
       await stravaClient.tokenRefresh();
-      process.stdout.write('✅ Token refreshed. Please re-run app.');
+      logSuccessMessage('Token refreshed. Please re-run app.');
+      exit(0);
     }
-    const errorMessage = error instanceof Error ? error.message : error;
-    process.stderr.write('☠️ Error occured. ' + errorMessage + EOL);
-    process.exit(1);
+    logErrorMessage(error instanceof Error ? error.message : error);
+    exit(1);
   }
 })();

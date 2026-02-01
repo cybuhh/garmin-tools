@@ -1,4 +1,3 @@
-import { EOL } from 'os';
 import chalk from 'chalk';
 import { unlink, rename } from 'fs/promises';
 import { GarminConnectClient, GearItem } from 'garmin/client';
@@ -7,6 +6,8 @@ import { createChangedActivity } from 'fit/createChangedActivity';
 import * as intervalsIcuConfig from '../etc/intervals_icu_config.json';
 import * as presets from '../etc/garmin_presets.json';
 import * as device from '../etc/device.json';
+import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
+import { exit, argv } from 'process';
 
 const REMOVE_ORIGIN_OPTION = '--remove-origin';
 
@@ -14,7 +15,7 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
   const intervalsClient = intervalsIcu(intervalsIcuConfig);
   const gcClient = new GarminConnectClient();
 
-  const args = process.argv.slice(2);
+  const args = argv.slice(2);
 
   const isRemoveOrigin = args.includes(REMOVE_ORIGIN_OPTION);
 
@@ -27,20 +28,20 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
       throw new Error(`Activity missing some data. ${JSON.stringify({ id, name, filename, date })}`);
     }
 
-    process.stdout.write(`👀 Importing activity: ${date} - ` + chalk.blue(name) + EOL);
+    logVerboseMessage(`Importing activity: ${date} - ` + chalk.blue(name));
 
     await intervalsClient.downloadOriginalActivityFile(id, filename);
-    process.stdout.write('✅ Activity imported to file: ' + chalk.blue(filename) + EOL);
+    logSuccessMessage('Activity imported to file: ' + chalk.blue(filename));
 
     await gcClient.initialize();
     const userProfile = await gcClient.getUserProfile();
-    process.stdout.write(`👀 Garmin user: ${userProfile.userProfileFullName}` + EOL);
+    logVerboseMessage('Garmin user  ' + userProfile.userProfileFullName);
 
     const backupFilename = `${filename}.bak`;
     await rename(filename, backupFilename);
     await createChangedActivity(backupFilename, filename, device);
 
-    process.stdout.write(`✅ Updated activity device to ${device.garminProduct}` + EOL);
+    logSuccessMessage('Updated activity device to  ' + device.garminProduct);
 
     const uploadedActivityId = await gcClient.uploadActivity(filename);
     if (!uploadedActivityId) {
@@ -48,11 +49,11 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
     }
     await unlink(filename);
     await unlink(backupFilename);
-    process.stdout.write(`✅ Activity uploaded with id ${uploadedActivityId}` + EOL);
+    logSuccessMessage('Activity uploaded with id ' + uploadedActivityId);
 
     if (isRemoveOrigin) {
       await intervalsClient.deleteActivity(id);
-      process.stdout.write(`🧹 Removed activity from origin ${id}` + EOL);
+      logSuccessMessage('Removed activity from origin ' + id);
     }
 
     await gcClient.updateLatestActivityName(uploadedActivityId, name);
@@ -72,11 +73,11 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
         return gcClient.linkGear(gear.uuid, uploadedActivityId);
       }, Promise.resolve());
 
-      process.stdout.write(`✅ Activity gear updated successfully` + EOL);
+      logSuccessMessage('Activity gear updated successfully' + device.garminProduct);
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : error;
-    process.stderr.write('☠️ Error occured. ' + errorMessage + EOL);
-    process.exit(1);
+    logErrorMessage(errorMessage);
+    exit(1);
   }
 })();
