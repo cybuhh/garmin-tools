@@ -77,7 +77,7 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
         return gcClient.linkGear(gear.uuid, uploadedActivityId);
       }, Promise.resolve());
 
-      logSuccessMessage('Activity gear updated successfully' + device.garminProduct);
+      logSuccessMessage(`Activity gear updated successfully ${device.garminProduct}`);
     }
   } catch (error) {
     logErrorMessage(error);

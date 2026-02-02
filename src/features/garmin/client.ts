@@ -122,19 +122,20 @@ export class GarminConnectClient extends GarminConnect {
       throw new Error('Upload activity - Invalid format: ' + format);
     }
 
-    const fileBuffer = (await readFile(filePath)) as unknown as BlobPart;
-    const blob = new Blob([fileBuffer]);
+    const fileBuffer = await readFile(filePath);
+    const filename = path.basename(filePath);
+    const blob = new Blob([fileBuffer], { type: 'application/octet-stream' });
 
-    const form = new FormData();
-    form.append('userfile', blob);
+    const form = new FormData() as FormData & { getHeaders?: () => Record<string, string> };
+    form.append('userfile', blob, filename);
 
     // https://connectapi.garmin.com/upload-service/upload/.fit
     const uploadUrl = `${urlClass.UPLOAD}.${format}`;
 
+    const formHeaders: Record<string, string> = typeof form.getHeaders === 'function' ? form.getHeaders() : {};
+
     const { headers } = await this.client.client.post(uploadUrl, form, {
-      headers: {
-        'Content-Type': 'multipart/form-data;',
-      },
+      headers: formHeaders,
     });
     if (!headers.location) {
       throw new Error(`Upload activty - ${headers['upload-message-content']}`);
