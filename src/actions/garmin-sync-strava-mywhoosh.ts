@@ -1,12 +1,12 @@
+import * as path from 'path';
+import { exit, cwd } from 'process';
 import { getLastestActivityFile } from 'features/mywhoosh/getLastestActivityFile';
 import { getDataPath } from 'features/mywhoosh/getDataPath';
 import { GarminConnectClient, GearItem } from 'features/garmin/client';
-import * as presets from '../../etc/garmin_presets.json';
-import * as stravaConfig from '../../etc/strava_config.json';
-import * as path from 'path';
 import { StravaClient } from 'features/strava/StravaClient';
 import { logErrorMessage, logSuccessMessage, logMessage, logVerboseMessage } from 'utils/log';
-import { exit, cwd } from 'process';
+import * as presets from '../../etc/garmin_presets.json';
+import * as stravaConfig from '../../etc/strava_config.json';
 
 const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
 

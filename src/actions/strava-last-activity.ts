@@ -1,8 +1,8 @@
 import * as path from 'path';
 import { exit } from 'process';
 import { StravaClient } from 'features/strava/StravaClient';
-import * as stravaConfig from '../../etc/strava_config.json';
 import { logErrorMessage, logMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
+import * as stravaConfig from '../../etc/strava_config.json';
 
 const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
 

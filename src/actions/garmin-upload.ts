@@ -1,13 +1,11 @@
-import { GarminConnectClient, GearItem } from 'features/garmin/client';
-import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
 import { exit, argv } from 'process';
+import { GarminConnectClient } from 'features/garmin/client';
+import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
 
 (async function main() {
   const gcClient = new GarminConnectClient();
 
-  const args = argv.slice(2);
-
-  const [filename] = args;
+  const [filename] = argv.slice(2);
 
   try {
     await gcClient.initialize();

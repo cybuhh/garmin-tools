@@ -1,4 +1,4 @@
-import { exit } from 'process';
+import { exit, argv } from 'process';
 import delay from 'utils/delay';
 import { getGarminClient } from 'features/garmin/client';
 import { logErrorMessage, logMessage, logVerboseMessage } from 'utils/log';
@@ -6,7 +6,7 @@ import { logErrorMessage, logMessage, logVerboseMessage } from 'utils/log';
 const REQUEST_DELAY = 5000;
 
 (async function main() {
-  const userId = Number(process.argv[2]);
+  const userId = Number(argv[2]);
 
   if (!userId) {
     logErrorMessage('Missing userId');
