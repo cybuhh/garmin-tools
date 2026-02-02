@@ -6,7 +6,7 @@ import { readFile } from 'fs/promises';
 import { stdin as input, stdout as output } from 'process';
 import { UrlClass } from 'garmin-connect/dist/garmin/UrlClass';
 import { UploadFileTypeTypeValue, UploadFileType, IActivity, ISocialProfile } from 'garmin-connect/dist/garmin/types';
-import delay from '../common/delay';
+import delay from 'utils/delay';
 
 const TOKENS_PATH = 'oauth_tokens';
 

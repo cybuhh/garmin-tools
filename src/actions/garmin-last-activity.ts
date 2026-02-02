@@ -1,4 +1,4 @@
-import { getGarminClient } from 'services/garmin/client';
+import { getGarminClient } from 'features/garmin/client';
 import { logErrorMessage, logMessage } from 'utils/log';
 import { exit } from 'process';
 

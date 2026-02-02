@@ -1,4 +1,4 @@
-import { GarminConnectClient, GearItem } from 'services/garmin/client';
+import { GarminConnectClient, GearItem } from 'features/garmin/client';
 import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
 import { exit, argv } from 'process';
 

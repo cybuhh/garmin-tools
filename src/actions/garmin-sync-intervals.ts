@@ -1,9 +1,9 @@
 import chalk from 'chalk';
 import { unlink, rename } from 'fs/promises';
 import { exit, argv } from 'process';
-import { getGarminClient, GearItem } from 'services/garmin/client';
-import { intervalsIcu } from 'services/intervalsIcu/intervalsIcu';
-import { createChangedActivity } from 'services/fit/createChangedActivity';
+import { getGarminClient, GearItem } from 'features/garmin/client';
+import { intervalsIcu } from 'features/intervalsIcu/intervalsIcu';
+import { createChangedActivity } from 'features/fit/createChangedActivity';
 import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
 import { createTmpPathIfNotExists, getTmpPath } from 'utils/fs';
 import * as intervalsIcuConfig from '../../etc/intervals_icu_config.json';

@@ -1,7 +1,7 @@
 import { exit } from 'process';
-import { getLastestActivityFile } from 'services/mywhoosh/getLastestActivityFile';
-import { getDataPath } from 'services/mywhoosh/getDataPath';
-import { GarminConnectClient } from 'services/garmin/client';
+import { getLastestActivityFile } from 'features/mywhoosh/getLastestActivityFile';
+import { getDataPath } from 'features/mywhoosh/getDataPath';
+import { GarminConnectClient } from 'features/garmin/client';
 import { logErrorMessage, logSuccessMessage } from 'utils/log';
 
 (async function main() {

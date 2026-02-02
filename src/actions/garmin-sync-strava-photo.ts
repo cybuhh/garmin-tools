@@ -1,6 +1,6 @@
-import { GarminConnectClient } from 'services/garmin/client';
+import { GarminConnectClient } from 'features/garmin/client';
 import * as path from 'path';
-import { StravaClient } from 'strava/StravaClient';
+import { StravaClient } from 'features/strava/StravaClient';
 import * as stravaConfig from '../../etc/strava_config.json';
 import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
 import { exit, argv, cwd } from 'process';

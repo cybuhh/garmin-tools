@@ -1,5 +1,5 @@
 import { rename } from 'fs/promises';
-import { createChangedActivity } from 'services/fit/createChangedActivity';
+import { createChangedActivity } from 'features/fit/createChangedActivity';
 import { logSuccessMessage } from 'utils/log';
 import * as device from '../../etc/device.json';
 

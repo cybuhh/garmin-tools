@@ -1,5 +1,5 @@
 import { logErrorMessage, logMessage } from 'utils/log';
-import { GarminConnectClient } from 'services/garmin/client';
+import { GarminConnectClient } from 'features/garmin/client';
 
 (async function main() {
   const gcClient = new GarminConnectClient();
