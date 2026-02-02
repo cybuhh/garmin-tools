@@ -4,7 +4,9 @@ garmin_presets.json
 intervals_icu_config.json
 oauth_tokens
 *.fit
+*.fit.bak
 *.zip
 node_modules
 dist
 device.json
+_tmp_/

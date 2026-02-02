@@ -5,8 +5,8 @@ import * as path from 'path';
 import { readFile } from 'fs/promises';
 import { stdin as input, stdout as output } from 'process';
 import { UrlClass } from 'garmin-connect/dist/garmin/UrlClass';
-import { UploadFileTypeTypeValue, UploadFileType, IActivity, IUserInfo, ISocialProfile } from 'garmin-connect/dist/garmin/types';
-import delay from '../common/delay';
+import { UploadFileTypeTypeValue, UploadFileType, IActivity, ISocialProfile } from 'garmin-connect/dist/garmin/types';
+import delay from 'utils/delay';
 
 const TOKENS_PATH = 'oauth_tokens';
 
@@ -122,16 +122,20 @@ export class GarminConnectClient extends GarminConnect {
       throw new Error('Upload activity - Invalid format: ' + format);
     }
 
-    const fileBuffer = (await readFile(filePath)) as unknown as BlobPart;
-    const blob = new Blob([fileBuffer]);
+    const fileBuffer = await readFile(filePath);
+    const filename = path.basename(filePath);
+    const blob = new Blob([fileBuffer], { type: 'application/octet-stream' });
 
-    const form = new FormData();
-    form.append('userfile', blob);
+    const form = new FormData() as FormData & { getHeaders?: () => Record<string, string> };
+    form.append('userfile', blob, filename);
 
-    const { headers } = await this.client.client.post(urlClass.UPLOAD + '.' + format, form, {
-      headers: {
-        'Content-Type': 'multipart/form-data;',
-      },
+    // https://connectapi.garmin.com/upload-service/upload/.fit
+    const uploadUrl = `${urlClass.UPLOAD}.${format}`;
+
+    const formHeaders: Record<string, string> = typeof form.getHeaders === 'function' ? form.getHeaders() : {};
+
+    const { headers } = await this.client.client.post(uploadUrl, form, {
+      headers: formHeaders,
     });
     if (!headers.location) {
       throw new Error(`Upload activty - ${headers['upload-message-content']}`);
@@ -184,4 +188,9 @@ export class GarminConnectClient extends GarminConnect {
 }
 interface NewsfeedItem {
   activityList: ReadonlyArray<IActivity>;
+}
+
+export function getGarminClient(username?: string, password?: string) {
+  const gcClient = new GarminConnectClient({ username, password });
+  return gcClient.initialize().then(() => gcClient);
 }

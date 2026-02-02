@@ -1,24 +1,33 @@
-import { getLastestActivityFile } from 'mywhoosh/getLastestActivityFile';
-import { getDataPath } from 'mywhoosh/getDataPath';
-import { GarminConnectClient, GearItem } from 'garmin/client';
-import * as presets from '../etc/garmin_presets.json';
-import * as stravaConfig from '../etc/strava_config.json';
 import * as path from 'path';
-import { StravaClient } from 'strava/StravaClient';
-import { logErrorMessage, logSuccessMessage, logMessage, logVerboseMessage } from 'utils/log';
 import { exit, cwd } from 'process';
+import { getLastestActivityFile } from 'features/mywhoosh/getLastestActivityFile';
+import { getDataPath } from 'features/mywhoosh/getDataPath';
+import { GarminConnectClient, GearItem } from 'features/garmin/client';
+import { StravaClient } from 'features/strava/StravaClient';
+import { logErrorMessage, logSuccessMessage, logMessage, logVerboseMessage } from 'utils/log';
+import * as presets from '../../etc/garmin_presets.json';
+import * as stravaConfig from '../../etc/strava_config.json';
 
 const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
 
 (async function main() {
   const myWhooshDataPath = getDataPath();
   const stravaClient = new StravaClient(stravaConfigPath, stravaConfig);
+  try {
+    await stravaClient.getAthlete();
+  } catch (error) {
+    if (error instanceof Error && 'statusCode' in error && error.statusCode === 401) {
+      logVerboseMessage('Refreshing token');
+      await stravaClient.tokenRefresh();
+      logSuccessMessage('Strava Token refreshed.');
+    }
+  }
 
   const gcClient = new GarminConnectClient();
 
   try {
     const latestActivityFile = await getLastestActivityFile(myWhooshDataPath);
-    logSuccessMessage(`✅ Latest activity file found: ${latestActivityFile}`);
+    logSuccessMessage(`Latest activity file found: ${latestActivityFile}`);
 
     const latestStravaActivity = await stravaClient.getLatestActivity();
 
@@ -56,7 +65,7 @@ const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
       logSuccessMessage('Token refreshed. Please re-run app.');
       exit(0);
     }
-    logErrorMessage(error instanceof Error ? error.message : error);
+    logErrorMessage(error);
     exit(1);
   }
 })();

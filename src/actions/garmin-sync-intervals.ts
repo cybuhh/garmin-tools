@@ -1,19 +1,19 @@
 import chalk from 'chalk';
 import { unlink, rename } from 'fs/promises';
-import { GarminConnectClient, GearItem } from 'garmin/client';
-import { intervalsIcu } from 'intervalsIcu/intervalsIcu';
-import { createChangedActivity } from 'fit/createChangedActivity';
-import * as intervalsIcuConfig from '../etc/intervals_icu_config.json';
-import * as presets from '../etc/garmin_presets.json';
-import * as device from '../etc/device.json';
-import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
 import { exit, argv } from 'process';
+import { getGarminClient, GearItem } from 'features/garmin/client';
+import { intervalsIcu } from 'features/intervalsIcu/intervalsIcu';
+import { createChangedActivity } from 'features/fit/createChangedActivity';
+import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
+import { createTmpPathIfNotExists, getTmpPath } from 'utils/fs';
+import * as intervalsIcuConfig from '../../etc/intervals_icu_config.json';
+import * as presets from '../../etc/garmin_presets.json';
+import * as device from '../../etc/device.json';
 
 const REMOVE_ORIGIN_OPTION = '--remove-origin';
 
 (async function main() {
   const intervalsClient = intervalsIcu(intervalsIcuConfig);
-  const gcClient = new GarminConnectClient();
 
   const args = argv.slice(2);
 
@@ -30,24 +30,28 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
 
     logVerboseMessage(`Importing activity: ${date} - ` + chalk.blue(name));
 
-    await intervalsClient.downloadOriginalActivityFile(id, filename);
-    logSuccessMessage('Activity imported to file: ' + chalk.blue(filename));
+    await createTmpPathIfNotExists();
+    const activityFilename = getTmpPath(filename.endsWith('.fit') ? filename : `${filename}.fit`);
 
-    await gcClient.initialize();
+    await intervalsClient.downloadOriginalActivityFile(id, activityFilename);
+    logSuccessMessage('Activity imported to file: ' + chalk.blue(activityFilename));
+
+    const gcClient = await getGarminClient();
     const userProfile = await gcClient.getUserProfile();
     logVerboseMessage('Garmin user  ' + userProfile.userProfileFullName);
 
-    const backupFilename = `${filename}.bak`;
-    await rename(filename, backupFilename);
-    await createChangedActivity(backupFilename, filename, device);
+    const backupFilename = `${activityFilename}.bak`;
+    await rename(activityFilename, backupFilename);
+    await createChangedActivity(backupFilename, activityFilename, device);
 
     logSuccessMessage('Updated activity device to  ' + device.garminProduct);
 
-    const uploadedActivityId = await gcClient.uploadActivity(filename);
+    const uploadedActivityId = await gcClient.uploadActivity(activityFilename);
     if (!uploadedActivityId) {
-      throw new Error(`Error uploading activity from file ${filename}`);
+      throw new Error(`Error uploading activity from file ${activityFilename}`);
     }
-    await unlink(filename);
+
+    await unlink(activityFilename);
     await unlink(backupFilename);
     logSuccessMessage('Activity uploaded with id ' + uploadedActivityId);
 
@@ -73,11 +77,10 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
         return gcClient.linkGear(gear.uuid, uploadedActivityId);
       }, Promise.resolve());
 
-      logSuccessMessage('Activity gear updated successfully' + device.garminProduct);
+      logSuccessMessage(`Activity gear updated successfully ${device.garminProduct}`);
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : error;
-    logErrorMessage(errorMessage);
+    logErrorMessage(error);
     exit(1);
   }
 })();
