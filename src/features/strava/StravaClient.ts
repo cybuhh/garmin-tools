@@ -3,7 +3,7 @@ import { EOL } from 'os';
 import * as strava from 'strava-v3';
 import type { client, DetailedActivityResponse } from 'strava-v3';
 
-interface StravaConfig {
+export interface StravaConfig {
   client_id: string;
   access_token: string;
   refresh_token: string;

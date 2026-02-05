@@ -1,15 +1,8 @@
 import { Decoder, Encoder, Stream, Message } from '@garmin/fitsdk';
 import { readFile, writeFile } from 'fs/promises';
+import { GarminDevice } from 'types/config';
 
-export interface Device {
-  serialNumber: number;
-  manufacturer: string;
-  product: number;
-  garminProduct: string;
-  softwareVersion: number;
-}
-
-export async function createChangedActivity(srcFilename: string, dstFilename: string, device: Device) {
+export async function createChangedActivity(srcFilename: string, dstFilename: string, device: GarminDevice) {
   const buffer = await readFile(srcFilename);
   const stream = Stream.fromByteArray(buffer);
   const decoder = new Decoder(stream);

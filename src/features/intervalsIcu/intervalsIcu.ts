@@ -1,9 +1,10 @@
 import { writeFile } from 'fs/promises';
 import { Activity } from '@intervals-icu/js-data-model';
+import { IntervalsIcuConfig } from 'types/config';
 
 const API_BASE_URL = 'https://intervals.icu/api/v1';
 
-export function intervalsIcu({ apiKey, athleteId = '0' }: { apiKey: string; athleteId?: string }) {
+export function intervalsIcu({ apiKey, athleteId = '0' }: IntervalsIcuConfig) {
   const headers = {
     Authorization: 'Basic ' + btoa(`API_KEY:${apiKey}`),
   };

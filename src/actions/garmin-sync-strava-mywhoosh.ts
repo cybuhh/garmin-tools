@@ -2,15 +2,19 @@ import * as path from 'path';
 import { exit, cwd } from 'process';
 import { getLastestActivityFile } from 'features/mywhoosh/getLastestActivityFile';
 import { getDataPath } from 'features/mywhoosh/getDataPath';
-import { GarminConnectClient, GearItem } from 'features/garmin/client';
-import { StravaClient } from 'features/strava/StravaClient';
+import { GarminConnectClient } from 'features/garmin/client';
+import { StravaClient, StravaConfig } from 'features/strava/StravaClient';
 import { logErrorMessage, logSuccessMessage, logMessage, logVerboseMessage } from 'utils/log';
-import * as presets from '../../etc/garmin_presets.json';
-import * as stravaConfig from '../../etc/strava_config.json';
+import { importConfig } from 'utils/fs';
+import { GarminPreset } from 'types/config';
+import { GearItem } from 'types/garmin';
 
 const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
 
 (async function main() {
+  const presets = await importConfig<GarminPreset>('./etc/garmin_presets.json');
+  const stravaConfig = await importConfig<StravaConfig>('./etc/strava_config.json');
+
   const myWhooshDataPath = getDataPath();
   const stravaClient = new StravaClient(stravaConfigPath, stravaConfig);
   try {

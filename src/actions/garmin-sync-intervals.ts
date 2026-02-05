@@ -1,18 +1,24 @@
 import chalk from 'chalk';
 import { unlink, rename } from 'fs/promises';
-import { exit, argv } from 'process';
-import { getGarminClient, GearItem } from 'features/garmin/client';
+import { argv } from 'process';
+import { GearItem, GearLinkResponse } from 'types/garmin';
+import { getGarminClient } from 'features/garmin/client';
 import { intervalsIcu } from 'features/intervalsIcu/intervalsIcu';
 import { createChangedActivity } from 'features/fit/createChangedActivity';
-import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
-import { createTmpPathIfNotExists, getTmpPath } from 'utils/fs';
-import * as intervalsIcuConfig from '../../etc/intervals_icu_config.json';
-import * as presets from '../../etc/garmin_presets.json';
-import * as device from '../../etc/device.json';
+import { logSuccessMessage, logVerboseMessage } from 'utils/log';
+import { createTmpPathIfNotExists, getTmpPath, importConfig } from 'utils/fs';
+import { GarminDevice, GarminPreset, IntervalsIcuConfig } from 'types/config';
+import { initErrorHandler } from 'utils/error';
 
 const REMOVE_ORIGIN_OPTION = '--remove-origin';
 
+initErrorHandler();
+
 (async function main() {
+  const intervalsIcuConfig = await importConfig<IntervalsIcuConfig>('./etc/intervals_icu_config.json');
+  const presets = await importConfig<GarminPreset>('./etc/garmin_presets.json');
+  const device = await importConfig<GarminDevice>('./etc/device.json');
+
   const intervalsClient = intervalsIcu(intervalsIcuConfig);
 
   const args = argv.slice(2);
@@ -21,66 +27,58 @@ const REMOVE_ORIGIN_OPTION = '--remove-origin';
 
   const actividyId = isRemoveOrigin ? args.filter((arg) => arg !== REMOVE_ORIGIN_OPTION).slice(-1)[0] : args[args.length - 1];
 
-  try {
-    const { id, name, filename, date } = actividyId ? await intervalsClient.getActivityDetails(actividyId) : await intervalsClient.getLatestActivity();
+  const { id, name, filename, date } = actividyId ? await intervalsClient.getActivityDetails(actividyId) : await intervalsClient.getLatestActivity();
+  if (!id || !name || !filename || !date) {
+    throw new Error(`Activity missing some data. ${JSON.stringify({ id, name, filename, date })}`);
+  }
 
-    if (!id || !name || !filename || !date) {
-      throw new Error(`Activity missing some data. ${JSON.stringify({ id, name, filename, date })}`);
-    }
+  logVerboseMessage(`Importing activity: ${date} - ` + chalk.blue(name));
+  await createTmpPathIfNotExists();
+  const activityFilename = getTmpPath(filename.endsWith('.fit') ? filename : `${filename}.fit`);
 
-    logVerboseMessage(`Importing activity: ${date} - ` + chalk.blue(name));
+  await intervalsClient.downloadOriginalActivityFile(id, activityFilename);
+  logSuccessMessage('Activity imported to file: ' + chalk.blue(activityFilename));
 
-    await createTmpPathIfNotExists();
-    const activityFilename = getTmpPath(filename.endsWith('.fit') ? filename : `${filename}.fit`);
+  const gcClient = await getGarminClient();
+  const userProfile = await gcClient.getUserProfile();
+  logVerboseMessage('Garmin user  ' + userProfile.userProfileFullName);
 
-    await intervalsClient.downloadOriginalActivityFile(id, activityFilename);
-    logSuccessMessage('Activity imported to file: ' + chalk.blue(activityFilename));
+  const backupFilename = `${activityFilename}.bak`;
+  await rename(activityFilename, backupFilename);
+  await createChangedActivity(backupFilename, activityFilename, device);
+  logSuccessMessage(`Updated activity device to ${device.garminProduct}`);
 
-    const gcClient = await getGarminClient();
-    const userProfile = await gcClient.getUserProfile();
-    logVerboseMessage('Garmin user  ' + userProfile.userProfileFullName);
+  const uploadedActivityId = await gcClient.uploadActivity(activityFilename);
+  if (!uploadedActivityId) {
+    throw new Error(`Error uploading activity from file ${activityFilename}`);
+  }
+  logSuccessMessage('Activity uploaded with id ' + uploadedActivityId);
 
-    const backupFilename = `${activityFilename}.bak`;
-    await rename(activityFilename, backupFilename);
-    await createChangedActivity(backupFilename, activityFilename, device);
+  await unlink(activityFilename);
+  await unlink(backupFilename);
 
-    logSuccessMessage('Updated activity device to  ' + device.garminProduct);
+  if (isRemoveOrigin) {
+    await intervalsClient.deleteActivity(id);
+    logSuccessMessage('Removed activity from origin ' + id);
+  }
 
-    const uploadedActivityId = await gcClient.uploadActivity(activityFilename);
-    if (!uploadedActivityId) {
-      throw new Error(`Error uploading activity from file ${activityFilename}`);
-    }
+  await gcClient.updateLatestActivityName(uploadedActivityId, name);
 
-    await unlink(activityFilename);
-    await unlink(backupFilename);
-    logSuccessMessage('Activity uploaded with id ' + uploadedActivityId);
+  if (presets && 'indoor' in presets && presets.indoor) {
+    const { indoor: indoorPreset } = presets;
 
-    if (isRemoveOrigin) {
-      await intervalsClient.deleteActivity(id);
-      logSuccessMessage('Removed activity from origin ' + id);
-    }
+    const activityGear = await gcClient.getGear({ profileId: userProfile.profileId });
 
-    await gcClient.updateLatestActivityName(uploadedActivityId, name);
+    await activityGear.reduce<Promise<GearLinkResponse | void>>(async (promise, gear: GearItem) => {
+      await promise;
+      return gcClient.unlinkGear(gear.uuid, uploadedActivityId);
+    }, Promise.resolve());
 
-    if ('indoor' in presets && presets.indoor) {
-      const { indoor: indoorPreset } = presets;
+    await indoorPreset.reduce<Promise<GearLinkResponse | void>>(async (promise, gear: GearItem) => {
+      await promise;
+      return gcClient.linkGear(gear.uuid, uploadedActivityId);
+    }, Promise.resolve());
 
-      const activityGear = await gcClient.getGear({ profileId: userProfile.profileId });
-
-      await activityGear.reduce<Promise<unknown>>(async (promise, gear: GearItem) => {
-        await promise;
-        return gcClient.unlinkGear(gear.uuid, uploadedActivityId);
-      }, Promise.resolve());
-
-      await indoorPreset.reduce<Promise<unknown>>(async (promise, gear: GearItem) => {
-        await promise;
-        return gcClient.linkGear(gear.uuid, uploadedActivityId);
-      }, Promise.resolve());
-
-      logSuccessMessage(`Activity gear updated successfully ${device.garminProduct}`);
-    }
-  } catch (error) {
-    logErrorMessage(error);
-    exit(1);
+    logSuccessMessage(`Activity gear updated successfully ${device.garminProduct}`);
   }
 })();
