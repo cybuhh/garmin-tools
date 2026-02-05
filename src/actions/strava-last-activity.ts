@@ -1,12 +1,16 @@
 import * as path from 'path';
 import { exit } from 'process';
-import { StravaClient } from 'features/strava/StravaClient';
+import { StravaClient, StravaConfig } from 'features/strava/StravaClient';
 import { logErrorMessage, logMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
-import * as stravaConfig from '../../etc/strava_config.json';
+import { importConfig } from 'utils/fs';
+import { initErrorHandler } from 'utils/error';
 
 const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
 
+initErrorHandler();
+
 (async function main() {
+  const stravaConfig = await importConfig<StravaConfig>('./etc/strava_config.json');
   const stravaClient = new StravaClient(stravaConfigPath, stravaConfig);
   try {
     await stravaClient.getAthlete();
@@ -18,19 +22,13 @@ const stravaConfigPath = path.join(process.cwd(), 'etc/strava_config.json');
     }
   }
 
-  try {
-    const { id, name } = await stravaClient.getLatestActivity();
-    if (!id || !name) {
-      logErrorMessage('Failed to fetch strava data');
-      exit(1);
-    }
-
-    const activityPhoto = await stravaClient.getActivityPhoto(id);
-
-    logMessage(`Latest strava activity name: ${name}`);
-    logMessage(`Latest strava activity photo: ${activityPhoto}`);
-  } catch (error) {
-    logErrorMessage(error);
-    exit(1);
+  const { id, name } = await stravaClient.getLatestActivity();
+  if (!id || !name) {
+    throw new Error();
   }
+
+  const activityPhoto = await stravaClient.getActivityPhoto(id);
+
+  logMessage(`Latest strava activity name: ${name}`);
+  logMessage(`Latest strava activity photo: ${activityPhoto}`);
 })();

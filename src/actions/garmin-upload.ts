@@ -1,29 +1,27 @@
-import { exit, argv } from 'process';
-import { GarminConnectClient } from 'features/garmin/client';
-import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
+import { argv } from 'process';
+import { getGarminClient } from 'features/garmin/client';
+import { logSuccessMessage, logVerboseMessage } from 'utils/log';
+import { initErrorHandler } from 'utils/error';
+
+initErrorHandler();
 
 (async function main() {
-  const gcClient = new GarminConnectClient();
+  const gcClient = await getGarminClient();
 
   const [filename] = argv.slice(2);
 
-  try {
-    await gcClient.initialize();
+  await gcClient.initialize();
 
-    logVerboseMessage(`Importing activity: ${filename}`);
+  logVerboseMessage(`Importing activity: ${filename}`);
 
-    const userProfile = await gcClient.getUserProfile();
-    logVerboseMessage('Garmin user  ' + userProfile.userProfileFullName);
+  const userProfile = await gcClient.getUserProfile();
+  logVerboseMessage('Garmin user  ' + userProfile.userProfileFullName);
 
-    const uploadedActivityId = await gcClient.uploadActivity(filename);
+  const uploadedActivityId = await gcClient.uploadActivity(filename);
 
-    if (!uploadedActivityId) {
-      throw new Error(`Error uploading activity from file ${filename}`);
-    }
-
-    logSuccessMessage('Activity uploaded with id ' + uploadedActivityId);
-  } catch (error) {
-    logErrorMessage(error);
-    exit(1);
+  if (!uploadedActivityId) {
+    throw new Error(`Error uploading activity from file ${filename}`);
   }
+
+  logSuccessMessage('Activity uploaded with id ' + uploadedActivityId);
 })();

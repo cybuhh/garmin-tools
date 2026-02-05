@@ -1,4 +1,4 @@
-import { AthleteRoutes, OAuthRoutes, AuthenticationConfig } from 'strava-v3';
+import 'strava-v3';
 
 declare module 'strava-v3' {
   export class client {
@@ -13,7 +13,6 @@ declare module 'strava-v3' {
     streams: StreamsRoutes;
     uploads: UploadsRoutes;
     rateLimiting: RateLimiting;
-    runningRaces: RunningRacesRoutes;
     routes: RoutesRoutes;
     oauth: OAuthRoutes;
     constructor(token: string);
@@ -31,7 +30,6 @@ declare module 'strava-v3' {
   export const streams: StreamsRoutes;
   export const uploads: UploadsRoutes;
   export const rateLimiting: RateLimiting;
-  export const runningRaces: RunningRacesRoutes;
   export const routes: RoutesRoutes;
   export const oauth: OAuthRoutes;
 

@@ -1,17 +1,14 @@
 import { exit } from 'process';
 import { getLastestActivityFile } from 'features/mywhoosh/getLastestActivityFile';
 import { getDataPath } from 'features/mywhoosh/getDataPath';
-import { GarminConnectClient } from 'features/garmin/client';
-import { logErrorMessage, logSuccessMessage } from 'utils/log';
+import { getGarminClient } from 'features/garmin/client';
+import { logSuccessMessage } from 'utils/log';
+import { initErrorHandler } from 'utils/error';
+
+initErrorHandler();
 
 (async function main() {
-  const gcClient = new GarminConnectClient();
-  try {
-    await gcClient.initialize();
-  } catch (error) {
-    logErrorMessage(error);
-    exit(1);
-  }
+  const gcClient = await getGarminClient();
 
   const myWhooshDataPath = getDataPath();
   const latestActivityFile = await getLastestActivityFile(myWhooshDataPath);

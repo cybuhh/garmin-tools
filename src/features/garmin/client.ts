@@ -7,40 +7,9 @@ import { stdin as input, stdout as output } from 'process';
 import { UrlClass } from 'garmin-connect/dist/garmin/UrlClass';
 import { UploadFileTypeTypeValue, UploadFileType, IActivity, ISocialProfile } from 'garmin-connect/dist/garmin/types';
 import delay from 'utils/delay';
+import { AddPhotoResponse, GearItem, GearLinkResponse } from 'types/garmin';
 
 const TOKENS_PATH = 'oauth_tokens';
-
-export interface GearItem {
-  uuid: string;
-  displayName: string;
-}
-
-interface AddPhotoResponse {
-  imageId: string;
-  url: string;
-  smallUrl: string;
-  mediumUrl: string;
-  expirationTimestamp: number;
-  latitude: null;
-  longitude: null;
-  photoDate: null;
-}
-
-interface UploadActivityResponse {
-  detailedImportResult: {
-    uploadId: number;
-    uploadUuid: { uuid: string };
-    owner: number;
-    fileSize: number;
-    processingTime: number;
-    creationDate: string;
-    ipAddress: string;
-    fileName: string;
-    report: null;
-    successes: [];
-    failures: [];
-  };
-}
 
 const urlClass = new UrlClass();
 const supportedFormats = [UploadFileType.fit, UploadFileType.gpx, UploadFileType.tcx];
@@ -98,11 +67,11 @@ export class GarminConnectClient extends GarminConnect {
   }
 
   async unlinkGear(uuid: string, activityId: string) {
-    return this.put(`${urlClass.GC_API}/gear-service/gear/unlink/${uuid}/activity/${activityId}`, {});
+    return this.put<GearLinkResponse>(`${urlClass.GC_API}/gear-service/gear/unlink/${uuid}/activity/${activityId}`, {});
   }
 
   async linkGear(uuid: string, activityId: string) {
-    return this.put(`${urlClass.GC_API}/gear-service/gear/link/${uuid}/activity/${activityId}`, {});
+    return this.put<GearLinkResponse>(`${urlClass.GC_API}/gear-service/gear/link/${uuid}/activity/${activityId}`, {});
   }
 
   async getUploadedActivityIdFromStatus(statusLocation: string): Promise<string> {

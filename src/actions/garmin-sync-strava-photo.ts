@@ -1,13 +1,14 @@
 import { exit, argv, cwd } from 'process';
 import * as path from 'path';
 import { GarminConnectClient } from 'features/garmin/client';
-import { StravaClient } from 'features/strava/StravaClient';
+import { StravaClient, StravaConfig } from 'features/strava/StravaClient';
 import { logErrorMessage, logSuccessMessage, logVerboseMessage } from 'utils/log';
-import * as stravaConfig from '../../etc/strava_config.json';
+import { importConfig } from 'utils/fs';
 
 const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
 
 (async function main() {
+  const stravaConfig = await importConfig<StravaConfig>('./etc/strava_config.json');
   const stravaClient = new StravaClient(stravaConfigPath, stravaConfig);
   const gcClient = new GarminConnectClient();
 
