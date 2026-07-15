@@ -128,8 +128,10 @@ export class GarminConnectClient extends GarminConnect {
 
   async getActivitiesFromNewsfeed(ownerId: number) {
     const qs = new URLSearchParams();
-    qs.append('start', String(1));
-    qs.append('limit', String(999));
+    // ownerType=ALL | CONNECTION | YOU
+    qs.append('ownerType', 'ALL');
+    // qs.append('start', String(0));
+    qs.append('limit', String(100));
     const query = qs.toString();
 
     const now = new Date();
@@ -149,10 +151,21 @@ export class GarminConnectClient extends GarminConnect {
     return this.client.post<{}>(`${urlClass.GC_API}/conversation-service/conversation/like/ACTIVITY/${activityId}`, {});
   }
 
+  async unlikeActivity(activityId: number | string) {
+    return this.client.delete<{}>(`${urlClass.GC_API}/conversation-service/conversation/like/${activityId}/0`, {});
+  }
+
   async addPhoto(activityId: number, imageBlob: Blob) {
     const formData = new FormData();
     formData.append('file', imageBlob, 'image.jpg');
     return this.client.post<AddPhotoResponse>(`${urlClass.GC_API}/activity-service/activity/${activityId}/image`, formData);
+  }
+
+  async getConnectionsCount() {
+    return this.client.get<AddPhotoResponse>(`${urlClass.GC_API}/connection-service/connection/connections/count`);
+  }
+  async getConnections() {
+    return this.client.get<AddPhotoResponse>(`${urlClass.GC_API}/connection-service/connection/connections`);
   }
 }
 interface NewsfeedItem {
