@@ -16,8 +16,9 @@
     "garmin-last-activity": "bun run src/actions/garmin-last-activity.ts",
     "strava-last-activity": "bun run src/actions/strava-last-activity.ts",
     "strava-last-activity-watch": "nodemon --config strava-last-activity.json",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint"
+    "indoor-sync": "npm run garmin-sync-intervals -- --remove-origin && npm run garmin-sync-strava-photo",
+    "lint": "eslint",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",

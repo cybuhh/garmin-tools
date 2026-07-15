@@ -39,6 +39,11 @@ const stravaConfigPath = path.join(cwd(), 'etc/strava_config.json');
     logVerboseMessage(`Latest strava activity name: ${stravaActivityName}`);
 
     const activityPhoto = await stravaClient.getActivityPhoto(stravaActivityId);
+    if (!activityPhoto) {
+      logVerboseMessage('No photo found for the latest strava activity');
+      exit(0);
+    }
+
     logVerboseMessage(`Latest strava activity photo: ${activityPhoto}`);
 
     const imageResponse = await fetch(activityPhoto);

@@ -84,6 +84,9 @@ export class StravaClient {
 
   async getActivityPhoto(id: string) {
     const activity = (await this.client.activities.get({ id })) as DetailedActivityResponse & ActivityPhotos;
+    if (!activity.photos || activity.photos.count === 0) {
+      return null;
+    }
     const { urls } = activity.photos.primary;
     const photoUrlKey = Object.keys(urls).map(Number).sort().slice(-1)[0];
     return urls[String(photoUrlKey)];
