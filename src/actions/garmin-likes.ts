@@ -5,6 +5,7 @@ import { logErrorMessage, logMessage, logVerboseMessage } from 'utils/log';
 import { initErrorHandler } from 'utils/error';
 
 const REQUEST_DELAY = 5000;
+const FULL_NAME = 'cybuhh';
 
 initErrorHandler();
 
@@ -25,6 +26,13 @@ initErrorHandler();
   await newsFeed.reduce(
     async (acc, activity) => {
       await acc;
+
+      const { activityLikeFullNames = [] } = activity;
+
+      if ((activityLikeFullNames as string[]).includes(FULL_NAME)) {
+        logMessage(`skipping 👍 like on ${activity.startTimeLocal} ${activity.activityId} - ${activity.activityName}`);
+        return Promise.resolve() as unknown as Promise<{}>;
+      }
       await delay(REQUEST_DELAY);
       logMessage(`👍 like on ${activity.startTimeLocal} ${activity.activityId} - ${activity.activityName}`);
       return gcClient.likeActivity(activity.activityId);
